@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Encode+Sans+SC:wght@100;200;300;400;500&family=Montserrat:ital,wght@0,200;0,300;1,100;1,200;1,300&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="./main.css" />
+    <title>Document</title>
+
+    <script defer src="./necessary_functions.js"></script>
+    <script defer src="./extrascript.js"></script>
+    <script defer src="./variables.js"></script>
+    <script defer src="./ineherentfuntions.js"></script>
+    <script defer src="./efficientalgorithms.js"></script>
+    <script defer src="./main.js"></script>
+  </head>
+
+  <body>
+    <section class="header_info">
+      <div class="node_traversal_info_head">
+        <select name="choose_algo" id="algo">
+          <option value="DFS">DFS</option>
+          <option value="BFS">BFS</option>
+          <option value="Dijkstra">Dijkstra</option>
+          <option value="A*">A*</option>
+        </select>
+
+        <select name="choose_mode" id="mode">
+          <option value="8-Directional">8-Directional</option>
+          <option value="4-Directional">4-Directional</option>
+        </select>
+      </div>
+
+      <h1 class="header">Movement algorithm is DFS.</h1>
+
+      <div class="node_traversal_info">
+        <button class="grid_options">Options</button>
+
+        <div class="blockade_control">
+          <button class="grid_add_block">Add blockade</button>
+          <button class="grid_remove_block">Remove blockade</button>
+        </div>
+
+        <div class="grid_info">
+          <label for="total_nodes">Total nodes</label>
+          <input type="text" id="total_nodes" />
+        </div>
+
+        <div class="grid_info">
+          <label for="columns">Columns</label>
+          <input type="text" id="columns" />
+        </div>
+
+        <div class="grid_info">
+          <label for="blocks">Blockades</label>
+          <input type="text" id="blocks" />
+        </div>
+
+        <button class="grid_gen">Generate</button>
+      </div>
+
+      <div class="node_traversal_info">
+        <button class="traversal_options">Traversal Options</button>
+
+        <button class="grid_reset">Reset traversal</button>
+
+        <div class="grid_info">
+          <label for="animation">Animation</label>
+          <select name="animation" id="animation_type">
+            <option value="Normal">Normal</option>
+            <option value="Instant">Instant</option>
+          </select>
+        </div>
+
+        <div class="view_cont">
+          <label for="source">source</label>
+          <input type="text" id="source" />
+        </div>
+
+        <div class="view_cont">
+          <label for="current">current</label>
+          <input type="text" id="current" />
+        </div>
+
+        <div class="view_cont">
+          <label for="target">target</label>
+          <input type="text" id="target" />
+        </div>
+      </div>
+    </section>
+
+    <section class="background"></section>
+
+    <div class="floating_message"></div>
+  </body>
+</html>
