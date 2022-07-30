@@ -1,24 +1,25 @@
-function generateRandomNumber(array, lowerrange, upperrange) {
-  let seed = Math.floor(
-    Math.random() * (upperrange - lowerrange + 1) + lowerrange - 1
-  );
-  // console.log(seed, !binarySearch(array, 0, array.length - 1, seed));
-  debugVars.currentIteration++;
-  if (debugVars.currentIteration > 50) {
-    debugVars.currentIteration = 0;
-    return NaN;
-  }
+// function generateRandomNumber(array, lowerrange, upperrange) {
+//   let seed = Math.floor(
+//     Math.random() * (upperrange - lowerrange + 1) + lowerrange - 1
+//   );
+//   // console.log(seed, !binarySearch(array, 0, array.length - 1, seed));
+//   debugVars.currentIteration++;
+//   if (debugVars.currentIteration > 50) {
+//     debugVars.currentIteration = 0;
+//     return NaN;
+//   }
 
-  if (!binarySearch(array, 0, array.length - 1, seed) && seed >= lowerrange) {
-    // console.log(seed);
-    debugVars.currentIteration = 0;
-    return seed;
-  } else {
-    generateRandomNumber(array, lowerrange, upperrange);
-  }
-}
+//   if (!binarySearch(array, 0, array.length - 1, seed) && seed >= lowerrange) {
+//     // console.log(seed);
+//     debugVars.currentIteration = 0;
+//     return seed;
+//   } else {
+//     generateRandomNumber(array, lowerrange, upperrange);
+//   }
+// }
 
-function stringyfyPQ(PQ) {
+function PQtoArray(PQ) {
+  //turns given priority queue into array
   let tempArr = [];
   // console.log(PQ);
   PQ.split(" ").forEach((elm) => {
@@ -29,6 +30,7 @@ function stringyfyPQ(PQ) {
 }
 
 function PQfyArray(PQ, array) {
+  //turns given array into priority queue
   // console.log(PQ);
   PQ.removeAll();
   for (let i = 0; i < array.length; i++) {
@@ -36,21 +38,22 @@ function PQfyArray(PQ, array) {
   }
 }
 
-function fixateArrays(array, fromIndex, from, nextElm) {
-  if (fromIndex >= array.length || from === undefined) return;
+// function fixateArrays(array, fromIndex, from, nextElm) {      //dated ineffiecient
+//   if (fromIndex >= array.length || from === undefined) return;
 
-  // console.log(from, nextElm);
+//   // console.log(from, nextElm);
 
-  array[fromIndex + 1] = from;
-  fixateArrays(array, fromIndex + 1, nextElm, array[fromIndex + 2]);
-}
+//   array[fromIndex + 1] = from;
+//   fixateArrays(array, fromIndex + 1, nextElm, array[fromIndex + 2]);
+// } //move array element by 1 index forward
 
-function fixPath(collection) {
-  let temp = collection.shift();
-  collection.push(temp);
-}
+// function fixPath(collection) {
+//   let temp = collection.shift();
+//   collection.push(temp);
+// } //dated
 
 function updatePosition() {
+  //adjusts position of the reference
   let temp1 = background.offsetTop;
   let temp2 = background.offsetLeft;
 
@@ -59,6 +62,7 @@ function updatePosition() {
 }
 
 function updateNeighParams() {
+  //updates neighbor navigation directions given on column change
   neighborParams.left = [
     -gridStats.columns,
     -(gridStats.columns - 1),
@@ -97,6 +101,7 @@ function updateNeighParams() {
 }
 
 function removeElements(parent) {
+  //removes childs of a given parent through DOM
   let nextLastChild = parent.lastElementChild;
   while (nextLastChild) {
     parent.removeChild(nextLastChild);
@@ -106,6 +111,7 @@ function removeElements(parent) {
 }
 
 function updateGridInfo() {
+  //updates grid statistics on column change
   if (gridColumns.value === "") {
     gridColumns.value = gridStats.columns;
     gridBlocks.value = numOfBlockades;
@@ -118,6 +124,7 @@ function updateGridInfo() {
 }
 
 function setGrid() {
+  //adjust grid
   gridStats.rows = Math.ceil(numOfGrid / gridStats.columns);
   background.style = ` grid-template-columns: repeat(${gridStats.columns}, 20px); grid-template-rows: repeat(${gridStats.rows}, 20px);`;
   background.style.width = `${
@@ -129,6 +136,7 @@ function setGrid() {
 }
 
 function generateBackground(count) {
+  //main function to generate grid
   let tempArr = "";
   for (let counter = 1; counter <= count; counter++) {
     tempArr += `<div class="landmark seed_${counter}" id="${counter}"></div>`;
@@ -139,23 +147,23 @@ function generateBackground(count) {
 
   // background.insertAdjacentHTML(
   // "beforeend",
-
   // );
 }
 
 function generateBlockades(count) {
+  //generate and update blockades
   illuminatePath("override", blockades, "rgb(0, 255, 0)");
   blockades = [];
   currentGridInfo.blockades.removeAll();
   currentGridInfo.allCheckedNodes = [];
-  console.log("debug :", blockades);
+  // console.log("debug :", blockades);
 
   for (let counter = 1; counter <= count; counter++) {
-    let seed = generateRandomNumber(blockades, 1, numOfGrid + 1);
+    let seed = GENERATERANDOMNUMBER(blockades, 1, numOfGrid + 1, "integer");
     // console.log(seed);
     if (seed !== NaN && seed) {
       currentGridInfo.blockades.push(seed, seed);
-      blockades = stringyfyPQ(currentGridInfo.blockades.printPQueue());
+      blockades = PQtoArray(currentGridInfo.blockades.printPQueue());
     } else {
       counter--;
     }
@@ -165,6 +173,7 @@ function generateBlockades(count) {
 }
 
 function showFloatingMsg(string, time) {
+  //invokes floating message window with given message
   floatingMsg.textContent = string;
   floatingMsg.style = `padding:20px;width:max-content`;
 
@@ -175,18 +184,21 @@ function showFloatingMsg(string, time) {
 }
 
 function updateViews(current) {
+  //update traversal view information
   sourceView.value = currentGridInfo.currentSource;
   currentView.value = current;
   targetView.value = currentGridInfo.currentTarget;
 }
 
 function endSequence(currentPositionId) {
+  //called when reference moves to destination
   elementStat.moveComplete = true;
   playerCharacterPosition.lastPositionId = currentPositionId;
   document.getElementById(playerCharacterPosition.currentPositionId).style = ``;
 }
 
 function getPosition(elm2) {
+  //gets postion of the reference
   if (elm2) {
     let elm = document.getElementById(elm2);
     let xpos = elm.offsetLeft - gridStats.fixerVarLeft;
@@ -196,6 +208,7 @@ function getPosition(elm2) {
 }
 
 function resetPlayerChar() {
+  //resets reference
   if (playerCharacterPosition.placed)
     document.getElementById(`1`).lastChild.remove();
   playerCharacterPosition.placed = false;
@@ -203,6 +216,7 @@ function resetPlayerChar() {
 }
 
 function illuminatePath(command, currentPath, color) {
+  // using DOM, given command, color and path array illuminates them
   for (let iteration = 0; iteration < currentPath.length; iteration++) {
     if (
       currentPath[iteration] &&
@@ -232,18 +246,21 @@ function illuminatePath(command, currentPath, color) {
 }
 
 function generalAnimation(position) {
+  //updates reference position
   playerCharacter.style = `transform :translate(${position[0]}px,${position[1]}px)`;
   playerCharacterPosition.posX = position[0];
   playerCharacterPosition.posY = position[1];
 }
 
 function basicPageAnimation(elmArray, styles) {
+  //function to simplify animation and DOM style
   for (let i = 0; i < elmArray.length; i++) {
     elmArray[i].style = styles[i];
   }
 }
 
 function controlGridOptionDrop(value) {
+  //grid option view controller
   if (!value) {
     basicPageAnimation([droppables[0]], [`height:30px;width:70px`]);
     pageLogics.grid_optionOpen = true;
@@ -254,6 +271,7 @@ function controlGridOptionDrop(value) {
 }
 
 function controlTraversalOptionDrop(value) {
+  //traversal option view controller
   if (!value) {
     basicPageAnimation([droppables[1]], [`height:40px;width:80px`]);
     pageLogics.traversal_optionOpen = true;
@@ -264,6 +282,7 @@ function controlTraversalOptionDrop(value) {
 }
 
 function initiateGridInfo(elementId) {
+  //initited current grid info based on reference position
   for (let i = 0; i < numOfGrid; i++) {
     currentGridInfo.gridToNodeRelations[i + 1] = [];
     currentGridInfo.gridToNodeWeights[i + 1] = [];
@@ -284,6 +303,7 @@ function initiateGridInfo(elementId) {
 }
 
 function resetGridInfo() {
+  //resets all grid info
   currentGridInfo.gridToNodeRelations = [];
   currentGridInfo.gridToNodeDistanceFromSource = [];
   currentGridInfo.gridToNodeDistanceToTarget = [];
@@ -307,6 +327,7 @@ function resetGridInfo() {
 }
 
 function printShortestPath(parents, node) {
+  //not always shortest depending on the algorithm
   if (parents[node] === -1) {
     currentPath.push(node + "");
     return;
@@ -320,6 +341,7 @@ function printShortestPath(parents, node) {
 }
 
 function algorithmEndingAction(target, command) {
+  //called after reference reach destination
   if (command !== "nopath") {
     illuminatePath("override", [currentGridInfo.currentSource], "yellow");
     illuminatePath("override", [target], "yellow");
@@ -338,6 +360,7 @@ function algorithmEndingAction(target, command) {
 }
 
 function placePlayerCharacterGrid(target) {
+  //positions reference
   if (elementStat.animationType === "Normal") {
     if (currentPath.length <= 0) {
       playerCharacterPosition.lastPositionId = target;
@@ -360,6 +383,7 @@ function placePlayerCharacterGrid(target) {
 }
 
 function calculateDistance(source, target) {
+  //calculates distance between given nodes
   let sourcePos = getPosition(source);
   let targetPos = getPosition(target);
 
@@ -371,6 +395,7 @@ function calculateDistance(source, target) {
 }
 
 function block_add_mode_toggle(value) {
+  //toggles into block drag adding mode
   if (!value) {
     basicPageAnimation(
       [add_block],
@@ -383,6 +408,7 @@ function block_add_mode_toggle(value) {
 }
 
 function block_remove_mode_toggle(value) {
+  //toggles into block drag removing mode
   if (!value) {
     basicPageAnimation(
       [remove_block],
@@ -394,7 +420,10 @@ function block_remove_mode_toggle(value) {
   }
 }
 
-function processAndReturn(id, command) {
+function processShiftBlockAddAndRemove(id, command) {
+  //process shift click adds and removes for add block or remove block
+  console.log(id);
+
   let tempArr = [];
   if (currentGridInfo.lastSelectedNode === null) {
     currentGridInfo.lastSelectedNode = id;
@@ -483,20 +512,22 @@ function processAndReturn(id, command) {
 }
 
 function add_blockade(id) {
+  //given array is push into blockades
   // console.log(id);
   illuminatePath(`override`, id, "rgb(0, 0, 0)");
   for (let i = 0; i < id.length; i++) {
     currentGridInfo.blockades.push(id[i], id[i]);
   }
-  blockades = stringyfyPQ(currentGridInfo.blockades.printPQueue());
+  blockades = PQtoArray(currentGridInfo.blockades.printPQueue());
   // binaryInsert(blockades, 0, blockades.length - 1, id)
 }
 
 function remove_blockade(id) {
+  //given array is removed from blockades given they exist
   //   console.log(id);
 
   illuminatePath(`override`, id, "rgb(0, 255, 0)");
-  blockades = stringyfyPQ(currentGridInfo.blockades.printPQueue());
+  blockades = PQtoArray(currentGridInfo.blockades.printPQueue());
   for (let i = 0; i < id.length; i++) {
     let idx = binarySearch(blockades, 0, blockades.length - 1, id[i], "F");
     blockades.splice(idx, 1);
@@ -506,6 +537,7 @@ function remove_blockade(id) {
 }
 
 function timer(command) {
+  //timer
   if (command === `start`) {
     let dateob = performance.now();
     lastTimerValue = dateob;

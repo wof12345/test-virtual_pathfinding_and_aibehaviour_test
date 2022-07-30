@@ -16,7 +16,7 @@ h1 {
   text-align: center;
 }
 
-.background {
+.master_container {
   background-color: rgb(0, 238, 32);
   width: 960px;
   height: 2540px;

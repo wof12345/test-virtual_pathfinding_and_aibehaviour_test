@@ -37,7 +37,7 @@ const Log = {
 function BINARYSEARCH(arr, start, end, target) {
   if (end >= start) {
     let mid = Math.floor(start + (end - start) / 2);
-    console.log(arr, mid, target);
+    // console.log(arr, mid, target);
 
     if (arr[mid] === target) return [true, mid];
 
@@ -73,7 +73,7 @@ function GENERATERANDOMNUMBER(
     arrayToCompare.length - 1,
     generatedNumber
   )[0];
-  console.log(binSres);
+  // console.log(binSres);
 
   if (!binSres && generatedNumber >= lowerrange) {
     return generatedNumber;

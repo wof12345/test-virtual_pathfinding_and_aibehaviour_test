@@ -1,9 +1,11 @@
+//initial calls
 generateBackground(numOfGrid); //24384
 updateGridInfo();
 setGrid();
 generateBlockades(numOfBlockades);
 
 function driverFunction(currentNode) {
+  // basically the heart of the project. Given current node generates an array of traversable neighbor nodes and ultimately realtions(edges).
   if (
     !binarySearch(
       currentGridInfo.closedNode,
@@ -53,6 +55,7 @@ function driverFunction(currentNode) {
 }
 
 function determineJourneyStats(elementId) {
+  //main algorithm call
   initiateGridInfo(playerCharacterPosition.lastPositionId);
   if (elementStat.currentAlgorithm === "Dijkstra") Dijkstra(elementId);
   else if (elementStat.currentAlgorithm === "A*") Astar(elementId);
@@ -64,6 +67,7 @@ function determineJourneyStats(elementId) {
 }
 
 function placePlayerCharacter(element, elementId, position) {
+  //place reference into initial position
   currentGridInfo.currentTarget = elementId;
   if (
     element.lastChild?.className !== "playerCharacter" &&
@@ -89,6 +93,7 @@ function placePlayerCharacter(element, elementId, position) {
 }
 
 background.addEventListener("click", function (e) {
+  //main click event listener which initiates everything
   if (e.target) {
     let goingto = +e.target.id;
     let pos = getPosition(goingto);
@@ -130,7 +135,7 @@ background.addEventListener("click", function (e) {
         // console.log(blockades);
         let tempArr = [goingto];
         if (pageKeyPressRecords.currentKeyPressed === "Shift") {
-          let isValid = processAndReturn(goingto);
+          let isValid = processShiftBlockAddAndRemove(goingto, "add");
           if (isValid) tempArr = isValid;
         } else {
           currentGridInfo.lastSelectedNode = null;
@@ -138,14 +143,11 @@ background.addEventListener("click", function (e) {
         add_blockade(tempArr);
         // console.log(blockades);
       }
-      if (
-        binarySearch(blockades, 0, blockades.length - 1, goingto) &&
-        pageLogics.remove_block_mode_on
-      ) {
+      if (pageLogics.remove_block_mode_on) {
         // console.log(blockades);
         let tempArr = [goingto];
         if (pageKeyPressRecords.currentKeyPressed === "Shift") {
-          let isValid = processAndReturn(goingto);
+          let isValid = processShiftBlockAddAndRemove(goingto, "remove");
           if (isValid) tempArr = isValid;
         } else {
           currentGridInfo.lastSelectedNode = null;
@@ -158,6 +160,7 @@ background.addEventListener("click", function (e) {
 });
 
 algo_select.addEventListener("change", function (e) {
+  //algorithm select event
   let algorithm = algo_select.value;
   let mode = mode_select.value;
   algorithmView.textContent = `Movement algorithm is ${algorithm}. Movement is ${mode}.`;
@@ -168,6 +171,7 @@ algo_select.addEventListener("change", function (e) {
 });
 
 mode_select.addEventListener("change", function (e) {
+  //mode select event
   let algorithm = algo_select.value;
   let mode = mode_select.value;
   algorithmView.textContent = `Movement algorithm is ${algorithm}. Movement is ${mode}.`;
@@ -178,6 +182,7 @@ mode_select.addEventListener("change", function (e) {
 });
 
 animation_select.addEventListener("change", () => {
+  //animation select event
   let animation_value = animation_select.value;
 
   elementStat.animationType = animation_value;
@@ -199,21 +204,25 @@ gridGenerationBtn.addEventListener("click", () => {
 });
 
 gridOptionbtn.addEventListener("click", () => {
+  //option btn event
   controlGridOptionDrop(pageLogics.grid_optionOpen);
   updatePosition();
 });
 
 traversalOptionbtn.addEventListener("click", () => {
+  //traversal btn event
   controlTraversalOptionDrop(pageLogics.traversal_optionOpen);
   updatePosition();
 });
 
 gridresetBtn.addEventListener("click", () => {
+  //reset grid called after grid change or algorithm ends
   resetPlayerChar();
   resetGridInfo();
 });
 
 add_block.addEventListener("click", () => {
+  //add block event
   if (!pageLogics.add_block_mode_on) {
     pageLogics.add_block_mode_on = true;
     block_add_mode_toggle(false);
@@ -224,6 +233,7 @@ add_block.addEventListener("click", () => {
 });
 
 remove_block.addEventListener("click", (e) => {
+  //remove block event
   if (!pageLogics.remove_block_mode_on) {
     pageLogics.remove_block_mode_on = true;
     block_remove_mode_toggle(false);
@@ -234,44 +244,49 @@ remove_block.addEventListener("click", (e) => {
 });
 
 window.addEventListener("resize", () => {
+  //update reference position on resizing window
   updatePosition();
 });
 
 document.addEventListener("click", function (e) {
-  //   console.log(e.target);
+  //general click listener
+  // console.log(e.target.parentNode.className);
 
   if (
-    e.target.parentNode.className !== "background" &&
+    e.target.parentNode.className !== "master_container" &&
     pageLogics.add_block_mode_on &&
     e.target.className !== "grid_add_block" &&
     e.target &&
-    e.target.className !== "background"
+    e.target.className !== "master_container"
   ) {
     block_add_mode_toggle(true);
   }
 
   if (
-    e.target.parentNode.className !== "background" &&
+    e.target.parentNode.className !== "master_container" &&
     pageLogics.remove_block_mode_on &&
     e.target.className !== "grid_remove_block" &&
     e.target &&
-    e.target.className !== "background"
+    e.target.className !== "master_container"
   ) {
     block_remove_mode_toggle(true);
   }
 });
 
 document.addEventListener("keydown", (e) => {
+  //general keypress listener
   pageKeyPressRecords.currentKeyPressed = e.key;
 });
 
 document.addEventListener("keyup", (e) => {
+  //general keyup listener
   if (e.key === pageKeyPressRecords.currentKeyPressed) {
     pageKeyPressRecords.currentKeyPressed = null;
   }
 });
 
 document.addEventListener("dragover", (e) => {
+  //general dragover listener
   let element = e.target;
   let id = +element.getAttribute("id");
   let tempArr = [id];

@@ -1,41 +1,52 @@
 let tempi = 0;
-let currentPath = [];
-let gridTotal = document.getElementById("total_nodes");
-let gridColumns = document.getElementById("columns");
-let gridBlocks = document.getElementById("blocks");
-let gridGenerationBtn = document.querySelector(".grid_gen");
-let gridresetBtn = document.querySelector(`.grid_reset`);
-let algo_select = document.getElementById(`algo`);
-let mode_select = document.getElementById(`mode`);
-let animation_select = document.getElementById(`animation_type`);
-let sourceView = document.getElementById(`source`);
-let currentView = document.getElementById(`current`);
-let targetView = document.getElementById(`target`);
-let algorithmView = document.querySelector(`.header`);
-let background = document.querySelector(`.background`);
-let floatingMsg = document.querySelector(`.floating_message`);
-let playerCharacter = document.querySelector(`.playerCharacter`);
-let traversalOptionbtn = document.querySelector(`.traversal_options`);
-let gridOptionbtn = document.querySelector(`.grid_options`);
-let droppables = document.querySelectorAll(`.node_traversal_info`);
-let add_block = document.querySelector(`.grid_add_block`);
-let remove_block = document.querySelector(`.grid_remove_block`);
 
-let numOfGrid = 2000;
-let numOfBlockades = 20;
+let currentPath = []; //stores the most recent used path
+
+let gridTotal = GETDOMQUERY("#total_nodes"); //stores container of total number of nodes
+let gridColumns = GETDOMQUERY("#columns"); //column input and view
+let gridBlocks = GETDOMQUERY("#blocks"); //block input and view
+let gridGenerationBtn = GETDOMQUERY(".grid_gen"); //generation button
+let gridresetBtn = GETDOMQUERY(`.grid_reset`); //reset button
+let algo_select = GETDOMQUERY(`#algo`); //algo select component
+let mode_select = GETDOMQUERY(`#mode`); //direction mode select component
+let animation_select = GETDOMQUERY(`#animation_type`); //animation type select
+let sourceView = GETDOMQUERY(`#source`); //current source
+let currentView = GETDOMQUERY(`#current`); //current node
+let targetView = GETDOMQUERY(`#target`); //destination node
+let algorithmView = GETDOMQUERY(`.header`); //current algorithm
+let background = GETDOMQUERY(`.master_container`); //outer most grid container
+let floatingMsg = GETDOMQUERY(`.floating_message`); //message view
+
+let playerCharacter = GETDOMQUERY(`.playerCharacter`); //traversal reference
+
+let traversalOptionbtn = GETDOMQUERY(`.traversal_options`); //traversal options
+let gridOptionbtn = GETDOMQUERY(`.grid_options`); //grid option button
+let droppables = GETDOMQUERY(`.node_traversal_info`); //view toggolabe options
+
+let add_block = GETDOMQUERY(`.grid_add_block`); //add block button
+let remove_block = GETDOMQUERY(`.grid_remove_block`); //remove block button
+
+let numOfGrid = 2000; //stores node count
+let numOfBlockades = 20; //blockade count
+
 let gridStats = {
   columns: 50,
-  rows: 0,
+  rows: 0, //don't manipulate
   fixerVarTop: background.offsetTop,
   fixerVarLeft: background.offsetLeft,
-};
-let playerClickCounter = 0;
-let blockades = [];
-let moveLogic = {
-  triedYpos: false,
-  triedXpos: false,
-};
-let timeConst = 100;
+}; //current grid statistics
+
+let playerClickCounter = 0; //counts clicks
+
+let blockades = []; //stores blockades
+
+// let moveLogic = {
+//   triedYpos: false,
+//   triedXpos: false,
+// }; outadated
+
+let timeConst = 100; //
+
 let playerCharacterPosition = {
   placed: false,
   lastPositionId: 1,
@@ -45,13 +56,14 @@ let playerCharacterPosition = {
   yChangeConstant: gridStats.columns,
   xDistanceConstant: 20,
   yDistanceConstant: 20,
-};
+}; //reference statistics
+
 let elementStat = {
   moveComplete: true,
   currentAlgorithm: "DFS",
   animationType: "Normal",
   mode: "8-Directional",
-};
+}; //selected options and conditions
 
 let neighborParams = {
   left: [
@@ -89,7 +101,7 @@ let neighborParams = {
   singleCrossRightBottom: gridStats.columns + 1,
   singleCrossRightTop: -(gridStats.columns - 1),
   singleCrossLeftTop: -(gridStats.columns + 1),
-};
+}; //hardcoded auto adjusting neighbour navigation
 
 let currentGridInfo = {
   gridToNodeRelations: [],
@@ -112,20 +124,20 @@ let currentGridInfo = {
   normalNodeIteration: [],
   traversalDone: false,
   lastSelectedNode: null,
-};
+}; //current traversal storages and information
 
 let debugVars = {
   maxIteration: 20,
   currentIteration: 0,
-};
+}; //debug
 
 let pageKeyPressRecords = {
   currentKeyPressed: null,
-};
+}; //keypress stores
 
 let pageLogics = {
   grid_optionOpen: false,
   traversal_optionOpen: false,
   add_block_mode_on: false,
   remove_block_mode_on: false,
-};
+}; //UI view logics
