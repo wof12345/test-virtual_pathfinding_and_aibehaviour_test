@@ -39,13 +39,13 @@ function BINARYSEARCH(arr, start, end, target) {
     let mid = Math.floor(start + (end - start) / 2);
     // console.log(arr, mid, target);
 
-    if (arr[mid] === target) return [true, mid];
+    if (arr[mid] === target) return true;
 
     if (arr[mid] > target) return BINARYSEARCH(arr, start, mid - 1, target);
 
     return BINARYSEARCH(arr, mid + 1, end, target);
   }
-  return [false, false];
+  return false;
 }
 
 function GENERATERANDOMNUMBER(

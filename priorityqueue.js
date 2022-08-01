@@ -17,7 +17,7 @@ class PriorityQueue {
 
   push(element, priority) {
     var qElement = new QElement(element, priority);
-    console.log(qElement);
+    // console.log(qElement);
 
     var contain = false;
     for (var i = 0; i < this.items.length; i++) {

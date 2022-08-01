@@ -25,28 +25,28 @@ function quickSort(arr, low, high) {
   }
 }
 
-function binarySearch(arr, start, end, target, command) {
-  // console.log(command);
+// function BINARYSEARCH(arr, start, end, target, command) {
+//   // console.log(command);
 
-  if (arr[0] > target || arr[end] < target) {
-    return false;
-  }
+//   if (arr[0] > target || arr[end] < target) {
+//     return false;
+//   }
 
-  if (end >= start) {
-    let mid = Math.floor(start + (end - start) / 2);
+//   if (end >= start) {
+//     let mid = Math.floor(start + (end - start) / 2);
 
-    if (arr[mid] === target) {
-      if (!command) return true;
-      else return mid;
-    }
+//     if (arr[mid] === target) {
+//       if (!command) return true;
+//       else return mid;
+//     }
 
-    if (arr[mid] > target)
-      return binarySearch(arr, start, mid - 1, target, command);
+//     if (arr[mid] > target)
+//       return BINARYSEARCH(arr, start, mid - 1, target, command);
 
-    return binarySearch(arr, mid + 1, end, target, command);
-  }
-  return false;
-}
+//     return BINARYSEARCH(arr, mid + 1, end, target, command);
+//   }
+//   return false;
+// }
 
 // function binaryInsert(arr, start, end, target) {
 //   if (end >= start) {
@@ -72,46 +72,44 @@ function binarySearch(arr, start, end, target, command) {
 //   return false;
 // } //dated
 
-function simulateDFS(target) {
-  if (currentGridInfo.closedNode.length <= 0) {
+function simulateDFS(reference, target) {
+  if (reference.closedNode.length <= 0) {
     algorithmEndingAction(target, "DFS");
     return;
   }
-  let currentVisit = currentGridInfo.closedNode.shift();
+  let currentVisit = reference.closedNode.shift();
   illuminatePath("", [currentVisit], "rgb(255, 255, 255)");
 
   setTimeout(() => {
-    simulateDFS(target);
+    simulateDFS(reference, target);
   }, 1);
 }
 
-function BFS(target) {
-  let currentNode = currentGridInfo.normalNodeIteration.shift();
+function BFS(reference, target) {
+  console.log(reference);
+
+  let currentNode = reference.normalNodeIteration.shift();
   driverFunction(currentNode);
 
-  // console.log(currentGridInfo.normalNodeIteration);
+  // console.log(reference.normalNodeIteration);
   updateViews(currentNode);
 
   illuminatePath("", [currentNode], "rgb(255, 255, 255)");
-  // console.log(`Adjacents of ${currentNode} : `, currentGridInfo.gridToNodeRelations[currentNode]);
-  for (
-    let i = 0;
-    i < currentGridInfo.gridToNodeRelations[currentNode].length;
-    i++
-  ) {
-    let currentAdjacent = currentGridInfo.gridToNodeRelations[currentNode][i];
+  // console.log(`Adjacents of ${currentNode} : `, reference.gridToNodeRelations[currentNode]);
+  for (let i = 0; i < reference.gridToNodeRelations[currentNode].length; i++) {
+    let currentAdjacent = reference.gridToNodeRelations[currentNode][i];
 
     if (
-      currentGridInfo.gridToNodeLevel[currentAdjacent] === -1 &&
-      !binarySearch(blockades, 0, blockades.length - 1, currentAdjacent)
+      reference.gridToNodeLevel[currentAdjacent] === -1 &&
+      !BINARYSEARCH(blockades, 0, blockades.length - 1, currentAdjacent)
     ) {
-      currentGridInfo.gridToNodeLevel[currentAdjacent] =
-        currentGridInfo.gridToNodeLevel[currentNode] + 1;
-      currentGridInfo.normalNodeIteration.push(currentAdjacent);
-      currentGridInfo.parentNode[currentAdjacent] = currentNode;
-      currentGridInfo.gridToNodeDistanceFromSource.push(currentAdjacent);
+      reference.gridToNodeLevel[currentAdjacent] =
+        reference.gridToNodeLevel[currentNode] + 1;
+      reference.normalNodeIteration.push(currentAdjacent);
+      reference.parentNode[currentAdjacent] = currentNode;
+      reference.gridToNodeDistanceFromSource.push(currentAdjacent);
 
-      // console.log(currentGridInfo.gridToNodeLevel[element], currentGridInfo.gridToNodeLevel[currentNode], currentGridInfo.closedNode);
+      // console.log(reference.gridToNodeLevel[element], reference.gridToNodeLevel[currentNode], reference.closedNode);
     } else {
     }
   }
@@ -119,118 +117,115 @@ function BFS(target) {
     algorithmEndingAction(target, "");
     return;
   }
-  if (currentGridInfo.normalNodeIteration.length <= 0) {
+  if (reference.normalNodeIteration.length <= 0) {
     algorithmEndingAction(target, "nopath");
     return;
   }
   setTimeout(() => {
-    BFS(target);
+    BFS(reference, target);
   }, 0.1);
 }
 
-function DFS(currentSource, parent, target) {
+function DFS(reference, currentSource, parent, target) {
   driverFunction(currentSource);
-  // console.log(currentGridInfo.currentSource, target);
-  // currentGridInfo.tsSortstartTime[currentSource] = currentGridInfo.timeVar++;
-  currentGridInfo.closedNode.push(currentSource);
+  // console.log(reference.currentSource, target);
+  // reference.tsSortstartTime[currentSource] = reference.timeVar++;
+  reference.closedNode.push(currentSource);
   // console.log(currentSource, parent);
   if (currentSource === +target) {
-    simulateDFS(target);
-    currentGridInfo.traversalDone = true;
+    simulateDFS(reference, target);
+    reference.traversalDone = true;
     return;
   }
 
-  if (!currentGridInfo.traversalDone) {
+  if (!reference.traversalDone) {
     for (
       let i = 0;
-      i < currentGridInfo.gridToNodeRelations[currentSource].length;
+      i < reference.gridToNodeRelations[currentSource].length;
       i++
     ) {
-      let currentAdjacent =
-        currentGridInfo.gridToNodeRelations[currentSource][i];
+      let currentAdjacent = reference.gridToNodeRelations[currentSource][i];
       if (
-        currentGridInfo.gridToNodeLevel[currentAdjacent] === -1 &&
-        !binarySearch(blockades, 0, blockades.length - 1, currentAdjacent)
+        reference.gridToNodeLevel[currentAdjacent] === -1 &&
+        !BINARYSEARCH(blockades, 0, blockades.length - 1, currentAdjacent)
       ) {
-        currentGridInfo.gridToNodeLevel[currentAdjacent] = 1;
-        currentGridInfo.parentNode[currentAdjacent] = currentSource;
+        reference.gridToNodeLevel[currentAdjacent] = 1;
+        reference.parentNode[currentAdjacent] = currentSource;
         updateViews(currentAdjacent);
 
-        DFS(currentAdjacent, currentSource, target);
+        DFS(reference, currentAdjacent, currentSource, target);
       } else if (
         currentAdjacent !== parent &&
-        currentGridInfo.gridToNodeDistanceFromSource[currentAdjacent] !== 2
+        reference.gridToNodeDistanceFromSource[currentAdjacent] !== 2
       ) {
-        currentGridInfo.cycles++;
+        reference.cycles++;
       }
     }
 
-    currentGridInfo.gridToNodeLevel[currentSource] = 2;
+    reference.gridToNodeLevel[currentSource] = 2;
     // illuminatePath('override', [currentSource], 'yellow');
-    // currentGridInfo.tsSortendTime[currentSource] = currentGridInfo.timeVar++;
+    // reference.tsSortendTime[currentSource] = reference.timeVar++;
   }
 }
 
-function Dijkstra(target) {
-  if (currentGridInfo.pqForPathfinding.isEmpty()) {
+function Dijkstra(reference, target) {
+  console.log(reference);
+
+  if (reference.pqForPathfinding.isEmpty()) {
     algorithmEndingAction(target, "nopath");
     return;
   }
-  let currentNode = +currentGridInfo.pqForPathfinding.front().element;
+  let currentNode = +reference.pqForPathfinding.front().element;
   driverFunction(currentNode);
-  currentGridInfo.pqForPathfinding.remove();
+  reference.pqForPathfinding.remove();
   if (currentNode == target) {
     algorithmEndingAction(target, "");
     return;
   }
-  for (
-    let i = 0;
-    i < currentGridInfo.gridToNodeRelations[currentNode].length;
-    i++
-  ) {
-    let neighborNode = +currentGridInfo.gridToNodeRelations[currentNode][i];
-    let weightToNode = +currentGridInfo.gridToNodeWeights[currentNode][i];
+  for (let i = 0; i < reference.gridToNodeRelations[currentNode].length; i++) {
+    let neighborNode = +reference.gridToNodeRelations[currentNode][i];
+    let weightToNode = +reference.gridToNodeWeights[currentNode][i];
     illuminatePath("", [currentNode], "rgb(255, 255, 255)");
     if (
-      currentGridInfo.gridToNodeDistanceFromSource[currentNode] + weightToNode <
-        currentGridInfo.gridToNodeDistanceFromSource[neighborNode] &&
-      !binarySearch(blockades, 0, blockades.length - 1, neighborNode)
+      reference.gridToNodeDistanceFromSource[currentNode] + weightToNode <
+        reference.gridToNodeDistanceFromSource[neighborNode] &&
+      !BINARYSEARCH(blockades, 0, blockades.length - 1, neighborNode)
     ) {
       updateViews(neighborNode);
-      currentGridInfo.gridToNodeDistanceFromSource[neighborNode] =
-        currentGridInfo.gridToNodeDistanceFromSource[currentNode] +
-        weightToNode;
-      currentGridInfo.pqForPathfinding.push(
+      reference.gridToNodeDistanceFromSource[neighborNode] =
+        reference.gridToNodeDistanceFromSource[currentNode] + weightToNode;
+      reference.pqForPathfinding.push(
         neighborNode,
-        currentGridInfo.gridToNodeDistanceFromSource[neighborNode]
+        reference.gridToNodeDistanceFromSource[neighborNode]
       );
-      currentGridInfo.parentNode[neighborNode] = currentNode;
+      reference.parentNode[neighborNode] = currentNode;
     } else {
     }
   }
   setTimeout(() => {
-    currentGridInfo.gridToNodeLevel[currentNode] = currentGridInfo
-      .gridToNodeLevel[currentNode]++;
-    currentGridInfo.closedNode.push(currentNode);
-    Dijkstra(target);
+    reference.gridToNodeLevel[currentNode] = reference.gridToNodeLevel[
+      currentNode
+    ]++;
+    reference.closedNode.push(currentNode);
+    Dijkstra(reference, target);
   }, 0.1);
 }
 
-function Astar(target) {
+function Astar(reference, target) {
   let currentNode;
 
-  if (currentGridInfo.pqForPathfinding.isEmpty()) {
+  if (reference.pqForPathfinding.isEmpty()) {
     algorithmEndingAction(target, "nopath");
     return;
   }
-  currentNode = +currentGridInfo.pqForPathfinding.front().element;
+  currentNode = +reference.pqForPathfinding.front().element;
 
   // timer("start");
   driverFunction(currentNode);
   // console.log("Driver Complexity : ", timer("stop"));
 
-  currentGridInfo.pqForPathfinding.remove();
-  currentGridInfo.closedNode.push(currentNode);
+  reference.pqForPathfinding.remove();
+  reference.closedNode.push(currentNode);
   if (currentNode == target) {
     algorithmEndingAction(target, "");
     return;
@@ -240,12 +235,8 @@ function Astar(target) {
   illuminatePath("", [currentNode], "rgb(255, 255, 255)");
   // console.log("Single illumination Complexity : ", timer("stop"));
 
-  for (
-    let i = 0;
-    i < currentGridInfo.gridToNodeRelations[currentNode].length;
-    i++
-  ) {
-    let neighborNode = +currentGridInfo.gridToNodeRelations[currentNode][i];
+  for (let i = 0; i < reference.gridToNodeRelations[currentNode].length; i++) {
+    let neighborNode = +reference.gridToNodeRelations[currentNode][i];
 
     // timer("start");
     let element = document.getElementById(neighborNode);
@@ -253,36 +244,37 @@ function Astar(target) {
     // console.log("Dom traversal Complexity", timer("stop"));
 
     // timer("start");
-    // let bool = !binarySearch(blockades, 0, blockades.length - 1, neighborNode);
+    // let bool = !BINARYSEARCH(blockades, 0, blockades.length - 1, neighborNode);
     // console.log(timer("stop"));
 
     // console.log(elementColor);
 
-    let gCost = calculateDistance(currentGridInfo.currentSource, neighborNode);
+    let gCost = calculateDistance(reference.currentSource, neighborNode);
     let hCost = calculateDistance(neighborNode, target);
     let fCost = gCost + hCost;
 
     if (
-      fCost < currentGridInfo.gridToNodeDistanceFromSource[neighborNode] &&
+      fCost < reference.gridToNodeDistanceFromSource[neighborNode] &&
       elementColor !== "rgb(0, 0, 0)" &&
-      !binarySearch(
-        currentGridInfo.closedNode,
+      !BINARYSEARCH(
+        reference.closedNode,
         0,
-        currentGridInfo.closedNode.length - 1,
+        reference.closedNode.length - 1,
         neighborNode
       )
     ) {
       updateViews(neighborNode);
-      currentGridInfo.gridToNodeDistanceFromSource[neighborNode] = fCost;
-      currentGridInfo.pqForPathfinding.push(neighborNode, hCost);
-      currentGridInfo.parentNode[neighborNode] = currentNode;
+      reference.gridToNodeDistanceFromSource[neighborNode] = fCost;
+      reference.pqForPathfinding.push(neighborNode, hCost);
+      reference.parentNode[neighborNode] = currentNode;
     } else {
     }
   }
 
   setTimeout(() => {
-    currentGridInfo.gridToNodeLevel[currentNode] = currentGridInfo
-      .gridToNodeLevel[currentNode]++;
-    Astar(target);
+    reference.gridToNodeLevel[currentNode] = reference.gridToNodeLevel[
+      currentNode
+    ]++;
+    Astar(reference, target);
   }, 0.1);
 }

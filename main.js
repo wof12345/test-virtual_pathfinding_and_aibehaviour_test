@@ -7,7 +7,7 @@ generateBlockades(numOfBlockades);
 function driverFunction(currentNode) {
   // basically the heart of the project. Given current node generates an array of traversable neighbor nodes and ultimately realtions(edges).
   if (
-    !binarySearch(
+    !BINARYSEARCH(
       currentGridInfo.closedNode,
       0,
       currentGridInfo.closedNode.length,
@@ -33,50 +33,51 @@ function driverFunction(currentNode) {
     }
 
     for (let i = 0; i < arrayToFollow.length; i++) {
-      let neighTemNode = currentNode + +arrayToFollow[i];
+      let neighborTemporaryNode = currentNode + +arrayToFollow[i];
       let distance;
 
-      if (neighTemNode <= numOfGrid && neighTemNode > 0) {
-        currentNeighbors.push(neighTemNode);
-        // console.log(neighTemNode);
+      if (neighborTemporaryNode <= numOfGrid && neighborTemporaryNode > 0) {
+        currentNeighbors.push(neighborTemporaryNode);
+        // console.log(neighborTemporaryNode);
 
-        currentGridInfo.gridToNodeRelations[currentNode].push(neighTemNode);
-        currentGridInfo.gridToNodeRelations[neighTemNode].push(currentNode);
+        currentGridInfo.gridToNodeRelations[currentNode].push(
+          neighborTemporaryNode
+        );
+        currentGridInfo.gridToNodeRelations[neighborTemporaryNode].push(
+          currentNode
+        );
 
-        distance = calculateDistance(neighTemNode, currentNode);
+        distance = calculateDistance(neighborTemporaryNode, currentNode);
         currentGridInfo.gridToNodeWeights[currentNode].push(distance);
-        currentGridInfo.gridToNodeWeights[neighTemNode].push(distance);
+        currentGridInfo.gridToNodeWeights[neighborTemporaryNode].push(distance);
       }
     }
 
     illuminatePath("", currentNeighbors, "rgba(255, 0, 0, 0.99)");
-    tempi++;
+    numberOfNodesTraversed++;
   }
+  console.log(numberOfNodesTraversed);
 }
 
-function determineJourneyStats(elementId) {
+function determineAlgorithm(reference, elementId) {
   //main algorithm call
   initiateGridInfo(playerCharacterPosition.lastPositionId);
-  if (elementStat.currentAlgorithm === "Dijkstra") Dijkstra(elementId);
-  else if (elementStat.currentAlgorithm === "A*") Astar(elementId);
+  if (elementStat.currentAlgorithm === "Dijkstra")
+    Dijkstra(reference, elementId);
+  else if (elementStat.currentAlgorithm === "A*") Astar(reference, elementId);
   else if (elementStat.currentAlgorithm === "DFS") {
-    DFS(currentGridInfo.currentSource, 0, elementId);
+    DFS(reference, reference.currentSource, 0, elementId);
   } else if (elementStat.currentAlgorithm === "BFS") {
-    BFS(elementId);
+    BFS(reference, elementId);
   }
 }
 
 function placePlayerCharacter(element, elementId, position) {
   //place reference into initial position
   currentGridInfo.currentTarget = elementId;
-  if (
-    element.lastChild?.className !== "playerCharacter" &&
-    !playerCharacterPosition.placed
-  ) {
-    element.insertAdjacentHTML(
-      "beforeend",
-      '<div class="playerCharacter"></div>'
-    );
+  if (!playerCharacterPosition.placed) {
+    element.innerHTML = '<div class="playerCharacter"></div>';
+
     playerCharacterPosition.placed = true;
     playerCharacter = document.querySelector(`.playerCharacter`);
     playerCharacterPosition.posX = position[0];
@@ -88,7 +89,7 @@ function placePlayerCharacter(element, elementId, position) {
     endSequence(playerCharacterPosition.currentPositionId);
   } else {
     illuminatePath("", [elementId], "rgba(255, 0, 0, 0.5)");
-    determineJourneyStats(elementId);
+    determineAlgorithm(currentGridInfo, elementId);
   }
 }
 
@@ -97,23 +98,24 @@ background.addEventListener("click", function (e) {
   if (e.target) {
     let goingto = +e.target.id;
     let pos = getPosition(goingto);
+
     if (!pageLogics.add_block_mode_on && !pageLogics.remove_block_mode_on) {
       if (pos) {
         currentGridInfo.lastSelectedNode = null;
         let topPos = pos[1];
         let leftPos = pos[0];
         updatePosition();
-        if (goingto.className === "playerCharacter") {
-        }
         if (
           elementStat.moveComplete &&
-          !binarySearch(blockades, 0, blockades.length - 1, goingto) &&
-          !(goingto.className === "playerCharacter")
+          !BINARYSEARCH(blockades, 0, blockades.length - 1, goingto) &&
+          goingto.className !== "playerCharacter"
         ) {
-          elementStat.moveComplete = false;
-          playerCharacterPosition.currentPositionId = goingto;
           playerClickCounter++;
-          resetGridInfo();
+
+          elementStat.moveComplete = false;
+          playerCharacterPosition.currentPositionId = goingto; //note
+
+          resetReferenceInfo(currentGridInfo);
 
           if (e.target.className !== "playerCharacter") {
             if (!playerCharacterPosition.placed)
@@ -129,7 +131,7 @@ background.addEventListener("click", function (e) {
       }
     } else {
       if (
-        !binarySearch(blockades, 0, blockades.length - 1, goingto) &&
+        !BINARYSEARCH(blockades, 0, blockades.length - 1, goingto) &&
         pageLogics.add_block_mode_on
       ) {
         // console.log(blockades);
@@ -218,7 +220,7 @@ traversalOptionbtn.addEventListener("click", () => {
 gridresetBtn.addEventListener("click", () => {
   //reset grid called after grid change or algorithm ends
   resetPlayerChar();
-  resetGridInfo();
+  resetReferenceInfo(currentGridInfo);
 });
 
 add_block.addEventListener("click", () => {
@@ -291,7 +293,7 @@ document.addEventListener("dragover", (e) => {
   let id = +element.getAttribute("id");
   let tempArr = [id];
   if (
-    !binarySearch(blockades, 0, blockades.length - 1, id) &&
+    !BINARYSEARCH(blockades, 0, blockades.length - 1, id) &&
     pageLogics.add_block_mode_on
   ) {
     // console.log(id);
@@ -299,7 +301,7 @@ document.addEventListener("dragover", (e) => {
   }
 
   if (
-    binarySearch(blockades, 0, blockades.length - 1, id) &&
+    BINARYSEARCH(blockades, 0, blockades.length - 1, id) &&
     pageLogics.remove_block_mode_on
   ) {
     // console.log(id);

@@ -2,14 +2,14 @@
 //   let seed = Math.floor(
 //     Math.random() * (upperrange - lowerrange + 1) + lowerrange - 1
 //   );
-//   // console.log(seed, !binarySearch(array, 0, array.length - 1, seed));
+//   // console.log(seed, !BINARYSEARCH(array, 0, array.length - 1, seed));
 //   debugVars.currentIteration++;
 //   if (debugVars.currentIteration > 50) {
 //     debugVars.currentIteration = 0;
 //     return NaN;
 //   }
 
-//   if (!binarySearch(array, 0, array.length - 1, seed) && seed >= lowerrange) {
+//   if (!BINARYSEARCH(array, 0, array.length - 1, seed) && seed >= lowerrange) {
 //     // console.log(seed);
 //     debugVars.currentIteration = 0;
 //     return seed;
@@ -53,7 +53,7 @@ function PQfyArray(PQ, array) {
 // } //dated
 
 function updatePosition() {
-  //adjusts position of the reference
+  //adjusts the constant relativlely different value for the reference
   let temp1 = background.offsetTop;
   let temp2 = background.offsetLeft;
 
@@ -154,16 +154,16 @@ function generateBlockades(count) {
   //generate and update blockades
   illuminatePath("override", blockades, "rgb(0, 255, 0)");
   blockades = [];
-  currentGridInfo.blockades.removeAll();
-  currentGridInfo.allCheckedNodes = [];
+  ref1.blockades.removeAll();
+  ref1.allCheckedNodes = [];
   // console.log("debug :", blockades);
 
   for (let counter = 1; counter <= count; counter++) {
     let seed = GENERATERANDOMNUMBER(blockades, 1, numOfGrid + 1, "integer");
     // console.log(seed);
     if (seed !== NaN && seed) {
-      currentGridInfo.blockades.push(seed, seed);
-      blockades = PQtoArray(currentGridInfo.blockades.printPQueue());
+      ref1.blockades.push(seed, seed);
+      blockades = PQtoArray(ref1.blockades.printPQueue());
     } else {
       counter--;
     }
@@ -302,38 +302,38 @@ function initiateGridInfo(elementId) {
   currentGridInfo.currentSource = elementId;
 }
 
-function resetGridInfo() {
+function resetReferenceInfo(reference) {
   //resets all grid info
-  currentGridInfo.gridToNodeRelations = [];
-  currentGridInfo.gridToNodeDistanceFromSource = [];
-  currentGridInfo.gridToNodeDistanceToTarget = [];
-  currentGridInfo.gridToNodeWeights = [];
-  currentGridInfo.gridToNodeLevel = [];
-  currentGridInfo.parentNode = [];
-  currentGridInfo.pqForPathfinding.removeAll();
+  reference.gridToNodeRelations = [];
+  reference.gridToNodeDistanceFromSource = [];
+  reference.gridToNodeDistanceToTarget = [];
+  reference.gridToNodeWeights = [];
+  reference.gridToNodeLevel = [];
+  reference.parentNode = [];
+  reference.pqForPathfinding.removeAll();
   currentPath = [];
-  currentGridInfo.closedNode = [];
-  currentGridInfo.currentSmallestfCost = Infinity;
-  currentGridInfo.cycles = 0;
-  currentGridInfo.timeVar = 0;
+  reference.closedNode = [];
+  reference.currentSmallestfCost = Infinity;
+  reference.cycles = 0;
+  reference.timeVar = 0;
   tempi = 0;
   illuminatePath("override", currentGridInfo.allCheckedNodes, "rgb(0, 255, 0)");
   illuminatePath("override", blockades, "rgb(0, 0, 0)");
-  currentGridInfo.allCheckedNodes = [];
-  currentGridInfo.tsSortendTime = [];
-  currentGridInfo.tsSortstartTime = [];
-  currentGridInfo.normalNodeIteration = [];
-  currentGridInfo.traversalDone = false;
+  reference.allCheckedNodes = [];
+  reference.tsSortendTime = [];
+  reference.tsSortstartTime = [];
+  reference.normalNodeIteration = [];
+  reference.traversalDone = false;
 }
 
-function printShortestPath(parents, node) {
+function simulatePath(parents, node) {
   //not always shortest depending on the algorithm
   if (parents[node] === -1) {
     currentPath.push(node + "");
     return;
   }
 
-  printShortestPath(parents, parents[node]);
+  simulatePath(parents, parents[node]);
 
   // console.log(node);
 
@@ -347,7 +347,7 @@ function algorithmEndingAction(target, command) {
     illuminatePath("override", [target], "yellow");
     // console.log(currentGridInfo.parentNode);
 
-    printShortestPath(currentGridInfo.parentNode, target);
+    simulatePath(currentGridInfo.parentNode, target);
 
     placePlayerCharacterGrid(target);
     illuminatePath("override", currentPath, "yellow");
@@ -446,7 +446,7 @@ function processShiftBlockAddAndRemove(id, command) {
         // console.log(currentGridInfo.lastSelectedNode);
         if (command === "add") {
           if (
-            !binarySearch(
+            !BINARYSEARCH(
               blockades,
               0,
               blockades.length - 1,
@@ -457,7 +457,7 @@ function processShiftBlockAddAndRemove(id, command) {
           }
         } else {
           if (
-            binarySearch(
+            BINARYSEARCH(
               blockades,
               0,
               blockades.length - 1,
@@ -482,7 +482,7 @@ function processShiftBlockAddAndRemove(id, command) {
       // console.log(currentGridInfo.lastSelectedNode, idFlag);
       if (command === "add") {
         if (
-          !binarySearch(
+          !BINARYSEARCH(
             blockades,
             0,
             blockades.length - 1,
@@ -493,7 +493,7 @@ function processShiftBlockAddAndRemove(id, command) {
         }
       } else {
         if (
-          binarySearch(
+          BINARYSEARCH(
             blockades,
             0,
             blockades.length - 1,
@@ -529,7 +529,7 @@ function remove_blockade(id) {
   illuminatePath(`override`, id, "rgb(0, 255, 0)");
   blockades = PQtoArray(currentGridInfo.blockades.printPQueue());
   for (let i = 0; i < id.length; i++) {
-    let idx = binarySearch(blockades, 0, blockades.length - 1, id[i], "F");
+    let idx = BINARYSEARCH(blockades, 0, blockades.length - 1, id[i], "F");
     blockades.splice(idx, 1);
   }
   PQfyArray(currentGridInfo.blockades, blockades);

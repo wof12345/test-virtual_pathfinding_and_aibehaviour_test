@@ -1,4 +1,4 @@
-let tempi = 0;
+let numberOfNodesTraversed = 0;
 
 let currentPath = []; //stores the most recent used path
 
@@ -101,7 +101,7 @@ let neighborParams = {
   singleCrossRightBottom: gridStats.columns + 1,
   singleCrossRightTop: -(gridStats.columns - 1),
   singleCrossLeftTop: -(gridStats.columns + 1),
-}; //hardcoded auto adjusting neighbour navigation
+}; //hardcoded auto adjusting neighbour navigation parameters
 
 let currentGridInfo = {
   gridToNodeRelations: [],
@@ -141,3 +141,61 @@ let pageLogics = {
   add_block_mode_on: false,
   remove_block_mode_on: false,
 }; //UI view logics
+
+class referenceObj {
+  constructor(posx, posy, referenceName) {
+    this.posX = posx;
+    this.posY = posy;
+    this.gridToNodeRelations = [];
+    this.gridToNodeDistanceFromSource = [];
+    this.gridToNodeWeights = [];
+    this.gridToNodeLevel = [];
+    this.pqForPathfinding = new PriorityQueue();
+    this.blockades = new PriorityQueue();
+    this.parentNode = [];
+    this.closedNode = [];
+    this.allCheckedNodes = [];
+    this.currentSource = 0;
+    this.currentTarget = 0;
+    this.gridToNodeDistanceToTarget = [];
+    this.currentSmallestfCost = Infinity;
+    this.timeVar = 0;
+    this.cycles = 0;
+    this.tsSortstartTime = [];
+    this.tsSortendTime = [];
+    this.normalNodeIteration = [];
+    this.traversalDone = false;
+    this.lastSelectedNode = null;
+    (this.placed = false),
+      (this.lastPositionId = 1),
+      (this.currentPositionId = 1),
+      (this.yChangeConstant = gridStats.columns),
+      (this.xDistanceConstant = 20),
+      (this.yDistanceConstant = 20);
+    this.referenceName = referenceName;
+  }
+
+  initialPlacement(element, elementId, position) {
+    //place reference into initial position
+    this.currentTarget = elementId;
+    if (!this.placed) {
+      element.innerHTML = `<div class="${this.referenceName} reference"></div>`;
+
+      this.placed = true;
+      this.posX = position[0];
+      this.posY = position[1];
+      this.currentPositionId = elementId;
+      this.lastPositionId = elementId;
+
+      generalAnimation(position);
+      endSequence(playerCharacterPosition.currentPositionId);
+    } else {
+      illuminatePath("", [elementId], "rgba(255, 0, 0, 0.5)");
+      determineAlgorithm(currentGridInfo, elementId);
+    }
+  }
+}
+
+let ref1 = new referenceObj(20, 20);
+
+console.log(ref1.placed);
