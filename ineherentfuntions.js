@@ -128,10 +128,10 @@ function setGrid() {
   gridStats.rows = Math.ceil(numOfGrid / gridStats.columns);
   background.style = ` grid-template-columns: repeat(${gridStats.columns}, 20px); grid-template-rows: repeat(${gridStats.rows}, 20px);`;
   background.style.width = `${
-    gridStats.columns * playerCharacterPosition.xDistanceConstant
+    gridStats.columns * gridConstants.xDistanceConstant
   }px`;
   background.style.height = `${
-    gridStats.rows * playerCharacterPosition.yDistanceConstant
+    gridStats.rows * gridConstants.yDistanceConstant
   }px`;
 }
 
@@ -150,26 +150,41 @@ function generateBackground(count) {
   // );
 }
 
-function generateBlockades(count) {
+function generateBlockades(reference, count) {
   //generate and update blockades
-  illuminatePath("override", blockades, "rgb(0, 255, 0)");
-  blockades = [];
-  ref1.blockades.removeAll();
-  ref1.allCheckedNodes = [];
+  illuminatePath(
+    currentGridInfo,
+    "override",
+    reference.blockades,
+    "rgb(0, 255, 0)"
+  );
+  reference.blockades = [];
+  reference.blockades.removeAll();
+  reference.allCheckedNodes = [];
   // console.log("debug :", blockades);
 
   for (let counter = 1; counter <= count; counter++) {
-    let seed = GENERATERANDOMNUMBER(blockades, 1, numOfGrid + 1, "integer");
+    let seed = GENERATERANDOMNUMBER(
+      referenceblockades,
+      1,
+      numOfGrid + 1,
+      "integer"
+    );
     // console.log(seed);
     if (seed !== NaN && seed) {
-      ref1.blockades.push(seed, seed);
-      blockades = PQtoArray(ref1.blockades.printPQueue());
+      reference.blockades.push(seed, seed);
+      referenceblockades = PQtoArray(reference.blockades.printPQueue());
     } else {
       counter--;
     }
   }
   // console.log(blockades);
-  illuminatePath("override", blockades, "rgb(0, 0, 0)");
+  illuminatePath(
+    currentGridInfo,
+    "override",
+    reference.blockades,
+    "rgb(0, 0, 0)"
+  );
 }
 
 function showFloatingMsg(string, time) {
@@ -190,11 +205,11 @@ function updateViews(current) {
   targetView.value = currentGridInfo.currentTarget;
 }
 
-function endSequence(currentPositionId) {
+function endSequence(reference) {
   //called when reference moves to destination
-  elementStat.moveComplete = true;
-  playerCharacterPosition.lastPositionId = currentPositionId;
-  document.getElementById(playerCharacterPosition.currentPositionId).style = ``;
+  reference.moveComplete = true;
+  reference.lastPositionId = reference.currentPositionId;
+  document.getElementById(reference.currentPositionId).style = ``;
 }
 
 function getPosition(elm2) {
@@ -207,15 +222,16 @@ function getPosition(elm2) {
   }
 }
 
-function resetPlayerChar() {
+function resetPlayerChars(references) {
   //resets reference
-  if (playerCharacterPosition.placed)
-    document.getElementById(`1`).lastChild.remove();
-  playerCharacterPosition.placed = false;
-  elementStat.moveComplete = true;
+  for (let i = 0; i < references.length; i++) {
+    if (reference.placed) document.getElementById(`1`).lastChild.remove();
+    reference.placed = false;
+    elementStat.moveComplete = true;
+  }
 }
 
-function illuminatePath(command, currentPath, color) {
+function illuminatePath(reference, command, currentPath, color) {
   // using DOM, given command, color and path array illuminates them
   for (let iteration = 0; iteration < currentPath.length; iteration++) {
     if (
@@ -238,18 +254,20 @@ function illuminatePath(command, currentPath, color) {
         element.style = `background-color:${color};`;
 
         if (color !== "rgb(0, 0, 0)") {
-          currentGridInfo.allCheckedNodes.push(currentPath[iteration]);
+          reference.allCheckedNodes.push(currentPath[iteration]);
         }
       }
     }
   }
 }
 
-function generalAnimation(position) {
+function generalAnimation(reference, position) {
   //updates reference position
-  playerCharacter.style = `transform :translate(${position[0]}px,${position[1]}px)`;
-  playerCharacterPosition.posX = position[0];
-  playerCharacterPosition.posY = position[1];
+  console.log(reference.referenceObjDOM);
+
+  reference.referenceObjDOM.style = `transform :translate(${position[0]}px,${position[1]}px)`;
+  reference.posX = position[0];
+  reference.posY = position[1];
 }
 
 function basicPageAnimation(elmArray, styles) {
@@ -281,106 +299,106 @@ function controlTraversalOptionDrop(value) {
   }
 }
 
-function initiateGridInfo(elementId) {
-  //initited current grid info based on reference position
-  for (let i = 0; i < numOfGrid; i++) {
-    currentGridInfo.gridToNodeRelations[i + 1] = [];
-    currentGridInfo.gridToNodeWeights[i + 1] = [];
-    currentGridInfo.gridToNodeLevel[i + 1] = [];
-    currentGridInfo.tsSortstartTime[i + 1] = [];
-    currentGridInfo.tsSortendTime[i + 1] = [];
-    currentGridInfo.gridToNodeDistanceFromSource[i + 1] = Infinity;
-    currentGridInfo.gridToNodeDistanceToTarget[i + 1] = -1;
-    currentGridInfo.gridToNodeLevel[i] = -1;
-  }
-  currentGridInfo.pqForPathfinding.push(elementId, 0);
-  currentGridInfo.normalNodeIteration.push(elementId);
-  currentGridInfo.gridToNodeDistanceFromSource[elementId] = 0;
-  currentGridInfo.gridToNodeLevel[elementId] = 1;
-  currentGridInfo.parentNode[elementId] = -1;
-  currentGridInfo.allCheckedNodes.push(elementId);
-  currentGridInfo.currentSource = elementId;
-}
+// function initiateGridInfo(elementId) {
+//   //initiated current grid info based on reference position
+//   for (let i = 0; i < numOfGrid; i++) {
+//     currentGridInfo.gridToNodeRelations[i + 1] = [];
+//     currentGridInfo.gridToNodeWeights[i + 1] = [];
+//     currentGridInfo.gridToNodeLevel[i + 1] = [];
+//     currentGridInfo.tsSortstartTime[i + 1] = [];
+//     currentGridInfo.tsSortendTime[i + 1] = [];
+//     currentGridInfo.gridToNodeDistanceFromSource[i + 1] = Infinity;
+//     currentGridInfo.gridToNodeDistanceToTarget[i + 1] = -1;
+//     currentGridInfo.gridToNodeLevel[i] = -1;
+//   }
+//   currentGridInfo.pqForPathfinding.push(elementId, 0);
+//   currentGridInfo.normalNodeIteration.push(elementId);
+//   currentGridInfo.gridToNodeDistanceFromSource[elementId] = 0;
+//   currentGridInfo.gridToNodeLevel[elementId] = 1;
+//   currentGridInfo.parentNode[elementId] = -1;
+//   currentGridInfo.allCheckedNodes.push(elementId);
+//   currentGridInfo.currentSource = elementId;
+// }
 
-function resetReferenceInfo(reference) {
-  //resets all grid info
-  reference.gridToNodeRelations = [];
-  reference.gridToNodeDistanceFromSource = [];
-  reference.gridToNodeDistanceToTarget = [];
-  reference.gridToNodeWeights = [];
-  reference.gridToNodeLevel = [];
-  reference.parentNode = [];
-  reference.pqForPathfinding.removeAll();
-  currentPath = [];
-  reference.closedNode = [];
-  reference.currentSmallestfCost = Infinity;
-  reference.cycles = 0;
-  reference.timeVar = 0;
-  tempi = 0;
-  illuminatePath("override", currentGridInfo.allCheckedNodes, "rgb(0, 255, 0)");
-  illuminatePath("override", blockades, "rgb(0, 0, 0)");
-  reference.allCheckedNodes = [];
-  reference.tsSortendTime = [];
-  reference.tsSortstartTime = [];
-  reference.normalNodeIteration = [];
-  reference.traversalDone = false;
-}
+// function resetReferenceInfo(reference) {
+//   //resets all grid info
+//   reference.gridToNodeRelations = [];
+//   reference.gridToNodeDistanceFromSource = [];
+//   reference.gridToNodeDistanceToTarget = [];
+//   reference.gridToNodeWeights = [];
+//   reference.gridToNodeLevel = [];
+//   reference.parentNode = [];
+//   reference.pqForPathfinding.removeAll();
+//   currentPath = [];
+//   reference.closedNode = [];
+//   reference.currentSmallestfCost = Infinity;
+//   reference.cycles = 0;
+//   reference.timeVar = 0;
+//   tempi = 0;
+//   illuminatePath("override", currentGridInfo.allCheckedNodes, "rgb(0, 255, 0)");
+//   illuminatePath("override", blockades, "rgb(0, 0, 0)");
+//   reference.allCheckedNodes = [];
+//   reference.tsSortendTime = [];
+//   reference.tsSortstartTime = [];
+//   reference.normalNodeIteration = [];
+//   reference.traversalDone = false;
+// }
 
-function simulatePath(parents, node) {
-  //not always shortest depending on the algorithm
-  if (parents[node] === -1) {
-    currentPath.push(node + "");
-    return;
-  }
+// function simulatePath(parents, node) {
+//   //not always shortest depending on the algorithm
+//   if (parents[node] === -1) {
+//     currentPath.push(node + "");
+//     return;
+//   }
 
-  simulatePath(parents, parents[node]);
+//   simulatePath(parents, parents[node]);
 
-  // console.log(node);
+//   // console.log(node);
 
-  currentPath.push(node + "");
-}
+//   currentPath.push(node + "");
+// }
 
-function algorithmEndingAction(target, command) {
-  //called after reference reach destination
-  if (command !== "nopath") {
-    illuminatePath("override", [currentGridInfo.currentSource], "yellow");
-    illuminatePath("override", [target], "yellow");
-    // console.log(currentGridInfo.parentNode);
+// function algorithmEndingAction(target, command) {
+//   //called after reference reach destination
+//   if (command !== "nopath") {
+//     illuminatePath("override", [currentGridInfo.currentSource], "yellow");
+//     illuminatePath("override", [target], "yellow");
+//     // console.log(currentGridInfo.parentNode);
 
-    simulatePath(currentGridInfo.parentNode, target);
+//     simulatePath(currentGridInfo.parentNode, target);
 
-    placePlayerCharacterGrid(target);
-    illuminatePath("override", currentPath, "yellow");
-    // console.log(currentPath);
-  } else {
-    showFloatingMsg(`No path valid!`, 3000);
-    updateViews("No path!");
-    resetPlayerChar();
-  }
-}
+//     placePlayerCharacterGrid(target);
+//     illuminatePath("override", currentPath, "yellow");
+//     // console.log(currentPath);
+//   } else {
+//     showFloatingMsg(`No path valid!`, 3000);
+//     updateViews("No path!");
+//     resetPlayerChar(currentGridInfo);
+//   }
+// }
 
-function placePlayerCharacterGrid(target) {
-  //positions reference
-  if (elementStat.animationType === "Normal") {
-    if (currentPath.length <= 0) {
-      playerCharacterPosition.lastPositionId = target;
-      elementStat.moveComplete = true;
-      return;
-    }
+// function placePlayerCharacterGrid(target) {
+//   //positions reference
+//   if (elementStat.animationType === "Normal") {
+//     if (currentPath.length <= 0) {
+//       playerCharacterPosition.lastPositionId = target;
+//       elementStat.moveComplete = true;
+//       return;
+//     }
 
-    let position = getPosition(currentPath.shift());
-    generalAnimation(position);
+//     let position = getPosition(currentPath.shift());
+//     generalAnimation(ref1, position);
 
-    setTimeout(() => {
-      placePlayerCharacterGrid(target);
-    }, 200);
-  } else {
-    let position = getPosition(currentPath.pop());
-    playerCharacterPosition.lastPositionId = target;
-    elementStat.moveComplete = true;
-    generalAnimation(position);
-  }
-}
+//     setTimeout(() => {
+//       placePlayerCharacterGrid(target);
+//     }, 200);
+//   } else {
+//     let position = getPosition(currentPath.pop());
+//     playerCharacterPosition.lastPositionId = target;
+//     elementStat.moveComplete = true;
+//     generalAnimation(ref1, position);
+//   }
+// }
 
 function calculateDistance(source, target) {
   //calculates distance between given nodes
@@ -420,7 +438,7 @@ function block_remove_mode_toggle(value) {
   }
 }
 
-function processShiftBlockAddAndRemove(id, command) {
+function processShiftBlockAddAndRemove(reference, id, command) {
   //process shift click adds and removes for add block or remove block
   console.log(id);
 
@@ -447,9 +465,9 @@ function processShiftBlockAddAndRemove(id, command) {
         if (command === "add") {
           if (
             !BINARYSEARCH(
-              blockades,
+              reference.blockades,
               0,
-              blockades.length - 1,
+              reference.blockades.length - 1,
               currentGridInfo.lastSelectedNode
             )
           ) {
@@ -458,9 +476,9 @@ function processShiftBlockAddAndRemove(id, command) {
         } else {
           if (
             BINARYSEARCH(
-              blockades,
+              reference.blockades,
               0,
-              blockades.length - 1,
+              reference.blockades.length - 1,
               currentGridInfo.lastSelectedNode
             )
           ) {
@@ -483,9 +501,9 @@ function processShiftBlockAddAndRemove(id, command) {
       if (command === "add") {
         if (
           !BINARYSEARCH(
-            blockades,
+            reference.blockades,
             0,
-            blockades.length - 1,
+            reference.blockades.length - 1,
             currentGridInfo.lastSelectedNode
           )
         ) {
@@ -494,9 +512,9 @@ function processShiftBlockAddAndRemove(id, command) {
       } else {
         if (
           BINARYSEARCH(
-            blockades,
+            reference.blockades,
             0,
-            blockades.length - 1,
+            reference.blockades.length - 1,
             currentGridInfo.lastSelectedNode
           )
         ) {
@@ -511,14 +529,14 @@ function processShiftBlockAddAndRemove(id, command) {
   }
 }
 
-function add_blockade(id) {
+function add_blockade(reference, id) {
   //given array is push into blockades
   // console.log(id);
-  illuminatePath(`override`, id, "rgb(0, 0, 0)");
+  illuminatePath(currentGridInfo, `override`, id, "rgb(0, 0, 0)");
   for (let i = 0; i < id.length; i++) {
-    currentGridInfo.blockades.push(id[i], id[i]);
+    reference.blockadesPQ.push(id[i], id[i]);
   }
-  blockades = PQtoArray(currentGridInfo.blockades.printPQueue());
+  reference.blockades = PQtoArray(currentGridInfo.blockadesPQ.printPQueue());
   // binaryInsert(blockades, 0, blockades.length - 1, id)
 }
 
@@ -526,13 +544,13 @@ function remove_blockade(id) {
   //given array is removed from blockades given they exist
   //   console.log(id);
 
-  illuminatePath(`override`, id, "rgb(0, 255, 0)");
+  illuminatePath(currentGridInfo, `override`, id, "rgb(0, 255, 0)");
   blockades = PQtoArray(currentGridInfo.blockades.printPQueue());
   for (let i = 0; i < id.length; i++) {
     let idx = BINARYSEARCH(blockades, 0, blockades.length - 1, id[i], "F");
     blockades.splice(idx, 1);
   }
-  PQfyArray(currentGridInfo.blockades, blockades);
+  PQfyArray(reference.blockadesPQ, reference.blockades);
   //   console.log(blockades);
 }
 
