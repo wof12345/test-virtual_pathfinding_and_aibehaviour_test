@@ -74,11 +74,11 @@ function quickSort(arr, low, high) {
 
 function simulateDFS(reference, target) {
   if (reference.closedNode.length <= 0) {
-    algorithmEndingAction(target, "DFS");
+    reference.algorithmEndingAction(target, "DFS");
     return;
   }
   let currentVisit = reference.closedNode.shift();
-  illuminatePath("", [currentVisit], "rgb(255, 255, 255)");
+  illuminatePath(reference, "", [currentVisit], "rgb(255, 255, 255)");
 
   setTimeout(() => {
     simulateDFS(reference, target);
@@ -89,12 +89,12 @@ function BFS(reference, target) {
   console.log(reference);
 
   let currentNode = reference.normalNodeIteration.shift();
-  driverFunction(currentNode);
+  driverFunction(reference, currentNode);
 
   // console.log(reference.normalNodeIteration);
   updateViews(currentNode);
 
-  illuminatePath("", [currentNode], "rgb(255, 255, 255)");
+  illuminatePath(reference, "", [currentNode], "rgb(255, 255, 255)");
   // console.log(`Adjacents of ${currentNode} : `, reference.gridToNodeRelations[currentNode]);
   for (let i = 0; i < reference.gridToNodeRelations[currentNode].length; i++) {
     let currentAdjacent = reference.gridToNodeRelations[currentNode][i];
@@ -114,11 +114,11 @@ function BFS(reference, target) {
     }
   }
   if (currentNode === +target) {
-    algorithmEndingAction(target, "");
+    reference.algorithmEndingAction(target, "");
     return;
   }
   if (reference.normalNodeIteration.length <= 0) {
-    algorithmEndingAction(target, "nopath");
+    reference.algorithmEndingAction(target, "nopath");
     return;
   }
   setTimeout(() => {
@@ -127,7 +127,7 @@ function BFS(reference, target) {
 }
 
 function DFS(reference, currentSource, parent, target) {
-  driverFunction(currentSource);
+  driverFunction(reference, currentSource);
   // console.log(reference.currentSource, target);
   // reference.tsSortstartTime[currentSource] = reference.timeVar++;
   reference.closedNode.push(currentSource);
@@ -172,20 +172,20 @@ function Dijkstra(reference, target) {
   console.log(reference);
 
   if (reference.pqForPathfinding.isEmpty()) {
-    algorithmEndingAction(target, "nopath");
+    reference.algorithmEndingAction(target, "nopath");
     return;
   }
   let currentNode = +reference.pqForPathfinding.front().element;
-  driverFunction(currentNode);
+  driverFunction(reference, currentNode);
   reference.pqForPathfinding.remove();
   if (currentNode == target) {
-    algorithmEndingAction(target, "");
+    reference.algorithmEndingAction(target, "");
     return;
   }
   for (let i = 0; i < reference.gridToNodeRelations[currentNode].length; i++) {
     let neighborNode = +reference.gridToNodeRelations[currentNode][i];
     let weightToNode = +reference.gridToNodeWeights[currentNode][i];
-    illuminatePath("", [currentNode], "rgb(255, 255, 255)");
+    illuminatePath(reference, "", [currentNode], "rgb(255, 255, 255)");
     if (
       reference.gridToNodeDistanceFromSource[currentNode] + weightToNode <
         reference.gridToNodeDistanceFromSource[neighborNode] &&
@@ -215,24 +215,24 @@ function Astar(reference, target) {
   let currentNode;
 
   if (reference.pqForPathfinding.isEmpty()) {
-    algorithmEndingAction(target, "nopath");
+    reference.algorithmEndingAction(target, "nopath");
     return;
   }
   currentNode = +reference.pqForPathfinding.front().element;
 
   // timer("start");
-  driverFunction(currentNode);
+  driverFunction(reference, currentNode);
   // console.log("Driver Complexity : ", timer("stop"));
 
   reference.pqForPathfinding.remove();
   reference.closedNode.push(currentNode);
   if (currentNode == target) {
-    algorithmEndingAction(target, "");
+    reference.algorithmEndingAction(target, "");
     return;
   }
 
   // timer("start");
-  illuminatePath("", [currentNode], "rgb(255, 255, 255)");
+  illuminatePath(reference, "", [currentNode], "rgb(255, 255, 255)");
   // console.log("Single illumination Complexity : ", timer("stop"));
 
   for (let i = 0; i < reference.gridToNodeRelations[currentNode].length; i++) {

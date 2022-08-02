@@ -40,7 +40,7 @@ h1 {
   cursor: pointer;
 }
 
-.playerCharacter {
+.reference {
   background-color: rgb(8, 8, 8);
   width: 15px;
   aspect-ratio: 1/1;

@@ -2,15 +2,15 @@
 generateBackground(numOfGrid); //24384
 updateGridInfo();
 setGrid();
-generateBlockades(numOfBlockades);
+generateBlockades(currentGridInfo, numOfBlockades);
 
-function driverFunction(currentNode) {
-  // basically the heart of the project. Given current node generates an array of traversable neighbor nodes and ultimately realtions(edges).
+function driverFunction(reference, currentNode) {
+  // basically the heart of the project. Given current node generates an array of traversable neighbor nodes and ultimately relations(edges).
   if (
     !BINARYSEARCH(
-      currentGridInfo.closedNode,
+      reference.closedNode,
       0,
-      currentGridInfo.closedNode.length,
+      reference.closedNode.length,
       currentNode
     )
   ) {
@@ -40,20 +40,16 @@ function driverFunction(currentNode) {
         currentNeighbors.push(neighborTemporaryNode);
         // console.log(neighborTemporaryNode);
 
-        currentGridInfo.gridToNodeRelations[currentNode].push(
-          neighborTemporaryNode
-        );
-        currentGridInfo.gridToNodeRelations[neighborTemporaryNode].push(
-          currentNode
-        );
+        reference.gridToNodeRelations[currentNode].push(neighborTemporaryNode);
+        reference.gridToNodeRelations[neighborTemporaryNode].push(currentNode);
 
         distance = calculateDistance(neighborTemporaryNode, currentNode);
-        currentGridInfo.gridToNodeWeights[currentNode].push(distance);
-        currentGridInfo.gridToNodeWeights[neighborTemporaryNode].push(distance);
+        reference.gridToNodeWeights[currentNode].push(distance);
+        reference.gridToNodeWeights[neighborTemporaryNode].push(distance);
       }
     }
 
-    illuminatePath("", currentNeighbors, "rgba(255, 0, 0, 0.99)");
+    illuminatePath(reference, "", currentNeighbors, "rgba(255, 0, 0, 0.99)");
     numberOfNodesTraversed++;
   }
   console.log(numberOfNodesTraversed);
@@ -61,7 +57,7 @@ function driverFunction(currentNode) {
 
 function determineAlgorithm(reference, elementId) {
   //main algorithm call
-  initiateGridInfo(playerCharacterPosition.lastPositionId);
+  ref1.initiateReferenceInfo(reference.lastPositionId);
   if (elementStat.currentAlgorithm === "Dijkstra")
     Dijkstra(reference, elementId);
   else if (elementStat.currentAlgorithm === "A*") Astar(reference, elementId);
@@ -72,62 +68,39 @@ function determineAlgorithm(reference, elementId) {
   }
 }
 
-function placePlayerCharacter(element, elementId, position) {
-  //place reference into initial position
-  currentGridInfo.currentTarget = elementId;
-  if (!playerCharacterPosition.placed) {
-    element.innerHTML = '<div class="playerCharacter"></div>';
+// function placePlayerCharacter(element, elementId, position) {
+//   //place reference into initial position
+//   currentGridInfo.currentTarget = elementId;
+//   if (!playerCharacterPosition.placed) {
+//     element.innerHTML = '<div class="playerCharacter"></div>';
 
-    playerCharacterPosition.placed = true;
-    playerCharacter = document.querySelector(`.playerCharacter`);
-    playerCharacterPosition.posX = position[0];
-    playerCharacterPosition.posY = position[1];
-    playerCharacterPosition.currentPositionId = elementId;
-    playerCharacterPosition.lastPositionId = elementId;
+//     playerCharacterPosition.placed = true;
+//     playerCharacter = document.querySelector(`.playerCharacter`);
+//     playerCharacterPosition.posX = position[0];
+//     playerCharacterPosition.posY = position[1];
+//     playerCharacterPosition.currentPositionId = elementId;
+//     playerCharacterPosition.lastPositionId = elementId;
 
-    generalAnimation(position);
-    endSequence(playerCharacterPosition.currentPositionId);
-  } else {
-    illuminatePath("", [elementId], "rgba(255, 0, 0, 0.5)");
-    determineAlgorithm(currentGridInfo, elementId);
-  }
-}
+//     generalAnimation(ref1, position);
+//     endSequence(playerCharacterPosition.currentPositionId);
+//   } else {
+//     illuminatePath("", [elementId], "rgba(255, 0, 0, 0.5)");
+//     determineAlgorithm(currentGridInfo, elementId);
+//   }
+// }
+
+let ref1 = new referenceObj(0, 0, "ref1");
 
 background.addEventListener("click", function (e) {
   //main click event listener which initiates everything
+
   if (e.target) {
     let goingto = +e.target.id;
     let pos = getPosition(goingto);
 
     if (!pageLogics.add_block_mode_on && !pageLogics.remove_block_mode_on) {
       if (pos) {
-        currentGridInfo.lastSelectedNode = null;
-        let topPos = pos[1];
-        let leftPos = pos[0];
-        updatePosition();
-        if (
-          elementStat.moveComplete &&
-          !BINARYSEARCH(blockades, 0, blockades.length - 1, goingto) &&
-          goingto.className !== "playerCharacter"
-        ) {
-          playerClickCounter++;
-
-          elementStat.moveComplete = false;
-          playerCharacterPosition.currentPositionId = goingto; //note
-
-          resetReferenceInfo(currentGridInfo);
-
-          if (e.target.className !== "playerCharacter") {
-            if (!playerCharacterPosition.placed)
-              goingto = document.querySelector(`.seed_1`);
-
-            placePlayerCharacter(
-              goingto,
-              playerCharacterPosition.currentPositionId,
-              [leftPos, topPos]
-            );
-          }
-        }
+        ref1.selectPlacementMode(e, goingto, pos);
       }
     } else {
       if (
@@ -192,7 +165,7 @@ animation_select.addEventListener("change", () => {
 
 gridGenerationBtn.addEventListener("click", () => {
   // console.log('clicked');
-  resetPlayerChar();
+  resetPlayerChars([ref1]);
   removeElements(background);
   updateGridInfo();
   generateBackground(numOfGrid);
@@ -219,8 +192,8 @@ traversalOptionbtn.addEventListener("click", () => {
 
 gridresetBtn.addEventListener("click", () => {
   //reset grid called after grid change or algorithm ends
-  resetPlayerChar();
-  resetReferenceInfo(currentGridInfo);
+  resetPlayerChars([ref1]);
+  ref1.resetReferenceInfo();
 });
 
 add_block.addEventListener("click", () => {
