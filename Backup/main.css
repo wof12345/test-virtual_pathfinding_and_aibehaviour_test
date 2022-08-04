@@ -101,14 +101,6 @@ h1 {
   padding: 7px;
 }
 
-.ref1 {
-  background-color: black;
-}
-
-.ref2 {
-  background-color: rgb(32, 22, 233);
-}
-
 @media screen and (max-width: 1084px) {
   .node_traversal_info,
   .node_traversal_info_head {

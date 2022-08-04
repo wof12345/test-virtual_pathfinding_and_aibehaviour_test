@@ -25,15 +25,60 @@ function quickSort(arr, low, high) {
   }
 }
 
+// function BINARYSEARCH(arr, start, end, target, command) {
+//   // console.log(command);
+
+//   if (arr[0] > target || arr[end] < target) {
+//     return false;
+//   }
+
+//   if (end >= start) {
+//     let mid = Math.floor(start + (end - start) / 2);
+
+//     if (arr[mid] === target) {
+//       if (!command) return true;
+//       else return mid;
+//     }
+
+//     if (arr[mid] > target)
+//       return BINARYSEARCH(arr, start, mid - 1, target, command);
+
+//     return BINARYSEARCH(arr, mid + 1, end, target, command);
+//   }
+//   return false;
+// }
+
+// function binaryInsert(arr, start, end, target) {
+//   if (end >= start) {
+//     let mid = Math.floor(start + (end - start) / 2);
+//     console.log(arr[mid - 1], arr[mid + 1], target);
+
+//     if (
+//       arr[mid - 1] < target &&
+//       (arr[mid + 1] > target || arr[mid + 1] === undefined) &&
+//       arr[mid] > target
+//     ) {
+//       fixateArrays(currentGridInfo. blockades, mid, currentGridInfo. blockades[mid], currentGridInfo. blockades[mid + 1]);
+//       arr[mid] = target;
+//       console.log(arr[mid]);
+
+//       return true;
+//     }
+
+//     if (arr[mid] > target) return binaryInsert(arr, start, mid - 1, target);
+
+//     return binaryInsert(arr, mid + 1, end, target);
+//   }
+//   return false;
+// } //dated
+
 function simulateDFS(reference, target) {
   if (reference.closedNode.length <= 0) {
     reference.algorithmEndingAction(target, "DFS");
     return;
   }
   let currentVisit = reference.closedNode.shift();
-
-  if (reference.isPlayer)
-    illuminatePath(reference, "", [currentVisit], "rgb(255, 255, 255)");
+  illuminatePath(reference, "", [currentVisit], "rgb(255, 255, 255)");
 
   setTimeout(() => {
     simulateDFS(reference, target);
@@ -49,9 +94,7 @@ function BFS(reference, target) {
   // console.log(reference.normalNodeIteration);
   updateViews(reference, currentNode);
 
-  if (reference.isPlayer)
-    illuminatePath(reference, "", [currentNode], "rgb(255, 255, 255)");
-
+  illuminatePath(reference, "", [currentNode], "rgb(255, 255, 255)");
   // console.log(`Adjacents of ${currentNode} : `, reference.gridToNodeRelations[currentNode]);
   for (let i = 0; i < reference.gridToNodeRelations[currentNode].length; i++) {
     let currentAdjacent = reference.gridToNodeRelations[currentNode][i];
@@ -70,6 +113,8 @@ function BFS(reference, target) {
       reference.normalNodeIteration.push(currentAdjacent);
       reference.parentNode[currentAdjacent] = currentNode;
       reference.gridToNodeDistanceFromSource.push(currentAdjacent);
+
+      // console.log(reference.gridToNodeLevel[element], reference.gridToNodeLevel[currentNode], reference.closedNode);
     } else {
     }
   }
@@ -88,7 +133,10 @@ function BFS(reference, target) {
 
 function DFS(reference, currentSource, parent, target) {
   driverFunction(reference, currentSource);
+  // console.log(reference.currentSource, target);
+  // reference.tsSortstartTime[currentSource] = reference.timeVar++;
   reference.closedNode.push(currentSource);
+  // console.log(currentSource, parent);
   if (currentSource === +target) {
     simulateDFS(reference, target);
     reference.traversalDone = true;
@@ -125,6 +173,8 @@ function DFS(reference, currentSource, parent, target) {
     }
 
     reference.gridToNodeLevel[currentSource] = 2;
+    // illuminatePath('override', [currentSource], 'yellow');
+    // reference.tsSortendTime[currentSource] = reference.timeVar++;
   }
 }
 
@@ -136,9 +186,7 @@ function Dijkstra(reference, target) {
     return;
   }
   let currentNode = +reference.pqForPathfinding.front().element;
-
   driverFunction(reference, currentNode);
-
   reference.pqForPathfinding.remove();
   if (currentNode == target) {
     reference.algorithmEndingAction(target, "");
@@ -147,10 +195,7 @@ function Dijkstra(reference, target) {
   for (let i = 0; i < reference.gridToNodeRelations[currentNode].length; i++) {
     let neighborNode = +reference.gridToNodeRelations[currentNode][i];
     let weightToNode = +reference.gridToNodeWeights[currentNode][i];
-
-    if (reference.isPlayer)
-      illuminatePath(reference, "", [currentNode], "rgb(255, 255, 255)");
-
+    illuminatePath(reference, "", [currentNode], "rgb(255, 255, 255)");
     if (
       reference.gridToNodeDistanceFromSource[currentNode] + weightToNode <
         reference.gridToNodeDistanceFromSource[neighborNode] &&
@@ -202,8 +247,7 @@ function Astar(reference, target) {
   }
 
   // timer("start");
-  if (reference.isPlayer)
-    illuminatePath(reference, "", [currentNode], "rgb(255, 255, 255)");
+  illuminatePath(reference, "", [currentNode], "rgb(255, 255, 255)");
   // console.log("Single illumination Complexity : ", timer("stop"));
 
   for (let i = 0; i < reference.gridToNodeRelations[currentNode].length; i++) {
@@ -213,6 +257,12 @@ function Astar(reference, target) {
     let element = document.getElementById(neighborNode);
     let elementColor = element.style.backgroundColor + "";
     // console.log("Dom traversal Complexity", timer("stop"));
+
+    // timer("start");
+    // let bool = !BINARYSEARCH(currentGridInfo. blockades, 0, currentGridInfo. blockades.length - 1, neighborNode);
+    // console.log(timer("stop"));
+
+    // console.log(elementColor);
 
     let gCost = calculateDistance(reference.currentSource, neighborNode);
     let hCost = calculateDistance(neighborNode, target);

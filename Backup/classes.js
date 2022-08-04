@@ -1,7 +1,5 @@
 class referenceObj {
-  constructor(posx, posy, referenceName, isPlayer) {
-    this.isPlayer = isPlayer;
-
+  constructor(posx, posy, referenceName) {
     this.posX = posx;
     this.posY = posy;
 
@@ -26,6 +24,7 @@ class referenceObj {
     this.tsSortendTime = [];
     this.normalNodeIteration = [];
     this.traversalDone = false;
+    this.lastSelectedNode = null;
 
     this.moveComplete = true;
 
@@ -44,8 +43,8 @@ class referenceObj {
       this.gridToNodeRelations[i + 1] = [];
       this.gridToNodeWeights[i + 1] = [];
       this.gridToNodeLevel[i + 1] = [];
-      // this.tsSortstartTime[i + 1] = [];
-      // this.tsSortendTime[i + 1] = [];
+      this.tsSortstartTime[i + 1] = [];
+      this.tsSortendTime[i + 1] = [];
       this.gridToNodeDistanceFromSource[i + 1] = Infinity;
       this.gridToNodeDistanceToTarget[i + 1] = -1;
       this.gridToNodeLevel[i] = -1;
@@ -62,14 +61,9 @@ class referenceObj {
   placementDetermination(element, elementId, position) {
     //place reference into initial position
     this.currentTarget = elementId;
-    // console.log(this.placed, this.referenceName);
-
+    // console.log(this.referenceObjDOM);
     if (!this.placed) {
-      element.insertAdjacentHTML(
-        "beforeend",
-        `<div class="${this.referenceName} reference"></div>`
-      );
-
+      element.innerHTML = `<div class="${this.referenceName} reference"></div>`;
       this.referenceObjDOM = GETDOMQUERY(`.${this.referenceName}`);
 
       this.placed = true;
@@ -81,9 +75,7 @@ class referenceObj {
       generalAnimation(this, position);
       endSequence(this);
     } else {
-      if (this.isPlayer)
-        illuminatePath(this, "", [elementId], "rgba(255, 0, 0, 0.5)");
-
+      illuminatePath(this, "", [elementId], "rgba(255, 0, 0, 0.5)");
       determineAlgorithm(this, elementId);
     }
   }
@@ -93,13 +85,13 @@ class referenceObj {
     if (command !== "nopath") {
       illuminatePath(this, "override", [this.currentSource], "yellow");
       illuminatePath(this, "override", [target], "yellow");
+      // console.log(this.parentNode);
 
       this.simulatePath(this.parentNode, target);
 
       this.placeReference(target);
-      // console.log(this.currentPath);
-
       illuminatePath(this, "override", this.currentPath, "yellow");
+      // console.log(currentPath);
     } else {
       showFloatingMsg(`No path valid!`, 3000);
       updateViews("No path!");
@@ -107,8 +99,8 @@ class referenceObj {
     }
   }
 
-  selectPlacementMode(className, goingto) {
-    let pos = getPosition(goingto);
+  selectPlacementMode(e, goingto, pos) {
+    this.lastSelectedNode = null;
     let topPos = pos[1];
     let leftPos = pos[0];
     updatePosition();
@@ -119,28 +111,36 @@ class referenceObj {
         0,
         currentGridInfo.blockades.length - 1,
         goingto
-      )
+      ) &&
+      goingto.className !== "playerCharacter"
     ) {
-      // playerClickCounter++;
+      playerClickCounter++;
 
       this.moveComplete = false;
       this.currentPositionId = goingto; //note
 
       this.resetReferenceInfo(this);
 
-      if (className !== "playerCharacter") {
+      if (e.target.className !== "playerCharacter") {
         if (!this.placed) goingto = document.querySelector(`.seed_1`);
 
         this.placementDetermination(goingto, this.currentPositionId, [
           leftPos,
           topPos,
         ]);
+
+        // placePlayerCharacter(
+        //   goingto,
+        //   playerCharacterPosition.currentPositionId,
+        //   [leftPos, topPos]
+        // );
       }
     }
   }
 
   simulatePath(parents, node) {
     //not always shortest depending on the algorithm
+    // console.log(parents);
 
     if (parents[node] === -1) {
       this.currentPath.push(node + "");
@@ -148,6 +148,8 @@ class referenceObj {
     }
 
     this.simulatePath(parents, parents[node]);
+
+    // console.log(node);
 
     this.currentPath.push(node + "");
   }
@@ -204,13 +206,6 @@ class referenceObj {
     if (this.placed) document.getElementById(`1`).lastChild.remove();
     this.placed = false;
     this.moveComplete = true;
-  }
-
-  placeInSeed(target) {
-    let position = getPosition(target);
-    console.log(position);
-
-    generalAnimation(this, position);
   }
 
   logself() {

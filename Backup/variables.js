@@ -1,5 +1,7 @@
 let numberOfNodesTraversed = 0;
 
+// let currentPath = []; //stores the most recent used path
+
 let gridTotal = GETDOMQUERY("#total_nodes"); //stores container of total number of nodes
 let gridColumns = GETDOMQUERY("#columns"); //column input and view
 let gridBlocks = GETDOMQUERY("#blocks"); //block input and view
@@ -37,6 +39,13 @@ let gridStats = {
 }; //current grid statistics
 
 let playerClickCounter = 0; //counts clicks
+
+// let blockades = []; //stores blockades
+
+// let moveLogic = {
+//   triedYpos: false,
+//   triedXpos: false,
+// }; outadated
 
 let timeConst = 100; //
 

@@ -40,6 +40,7 @@ function driverFunction(reference, currentNode) {
 
       if (neighborTemporaryNode <= numOfGrid && neighborTemporaryNode > 0) {
         currentNeighbors.push(neighborTemporaryNode);
+        // console.log(neighborTemporaryNode);
 
         reference.gridToNodeRelations[currentNode].push(neighborTemporaryNode);
         reference.gridToNodeRelations[neighborTemporaryNode].push(currentNode);
@@ -50,18 +51,15 @@ function driverFunction(reference, currentNode) {
       }
     }
 
-    if (reference.isPlayer)
-      illuminatePath(reference, "", currentNeighbors, "rgba(255, 0, 0, 0.99)");
-
+    illuminatePath(reference, "", currentNeighbors, "rgba(255, 0, 0, 0.99)");
     numberOfNodesTraversed++;
   }
+  // console.log(numberOfNodesTraversed);
 }
 
 function determineAlgorithm(reference, elementId) {
   //main algorithm call
-  // console.log(reference.referenceName);
-
-  reference.initiateReferenceInfo(reference.lastPositionId);
+  ref1.initiateReferenceInfo(reference.lastPositionId);
   if (elementStat.currentAlgorithm === "Dijkstra")
     Dijkstra(reference, elementId);
   else if (elementStat.currentAlgorithm === "A*") Astar(reference, elementId);
@@ -72,48 +70,40 @@ function determineAlgorithm(reference, elementId) {
   }
 }
 
-let ref1 = new referenceObj(0, 0, "ref1", true);
-let ref2 = new referenceObj(0, 0, "ref2", false);
-let ref3 = new referenceObj(0, 0, "ref3", false);
+// function placePlayerCharacter(element, elementId, position) {
+//   //place reference into initial position
+//   currentGridInfo.currentTarget = elementId;
+//   if (!playerCharacterPosition.placed) {
+//     element.innerHTML = '<div class="playerCharacter"></div>';
 
-// ref2.initiateReferenceInfo();
-// ref2.selectPlacementMode("", 2);
-// ref2.placeInSeed(100);
+//     playerCharacterPosition.placed = true;
+//     playerCharacter = document.querySelector(`.playerCharacter`);
+//     playerCharacterPosition.posX = position[0];
+//     playerCharacterPosition.posY = position[1];
+//     playerCharacterPosition.currentPositionId = elementId;
+//     playerCharacterPosition.lastPositionId = elementId;
 
-setInterval(() => {
-  let rand = GENERATERANDOMNUMBER([], 1, 2000, "integer", 0);
-  let rand1 = GENERATERANDOMNUMBER([], 1, 2000, "integer", 0);
+//     generalAnimation(ref1, position);
+//     endSequence(playerCharacterPosition.currentPositionId);
+//   } else {
+//     illuminatePath("", [elementId], "rgba(255, 0, 0, 0.5)");
+//     determineAlgorithm(currentGridInfo, elementId);
+//   }
+// }
 
-  if (
-    !BINARYSEARCH(
-      currentGridInfo.blockades,
-      0,
-      currentGridInfo.blockades.length - 1,
-      rand
-    ) &&
-    !BINARYSEARCH(
-      currentGridInfo.blockades,
-      0,
-      currentGridInfo.blockades.length - 1,
-      rand1
-    )
-  )
-    ref2.selectPlacementMode("", rand);
-  ref3.selectPlacementMode("", rand1);
-
-  console.log(rand, rand1);
-}, 5000);
+let ref1 = new referenceObj(0, 0, "ref1");
 
 background.addEventListener("click", function (e) {
   //main click event listener which initiates everything
 
   if (e.target) {
     let goingto = +e.target.id;
-    console.log(ref2.posX, ref2.posY);
+    let pos = getPosition(goingto);
 
     if (!pageLogics.add_block_mode_on && !pageLogics.remove_block_mode_on) {
-      ref1.selectPlacementMode(e.target.className, goingto);
-      // ref2.selectPlacementMode("", 200);
+      if (pos) {
+        ref1.selectPlacementMode(e, goingto, pos);
+      }
     } else {
       if (
         !BINARYSEARCH(
@@ -124,6 +114,7 @@ background.addEventListener("click", function (e) {
         ) &&
         pageLogics.add_block_mode_on
       ) {
+        // console.log(blockades);
         let tempArr = [goingto];
         if (pageKeyPressRecords.currentKeyPressed === "Shift") {
           let isValid = processShiftBlockAddAndRemove(
@@ -136,8 +127,10 @@ background.addEventListener("click", function (e) {
           currentGridInfo.lastSelectedNode = null;
         }
         add_blockade(currentGridInfo, tempArr);
+        // console.log(blockades);
       }
       if (pageLogics.remove_block_mode_on) {
+        // console.log(blockades);
         let tempArr = [goingto];
         if (pageKeyPressRecords.currentKeyPressed === "Shift") {
           let isValid = processShiftBlockAddAndRemove(
@@ -150,6 +143,7 @@ background.addEventListener("click", function (e) {
           currentGridInfo.lastSelectedNode = null;
         }
         remove_blockade(currentGridInfo, tempArr);
+        // console.log(blockades);
       }
     }
   }
@@ -192,6 +186,10 @@ gridGenerationBtn.addEventListener("click", () => {
   setGrid();
   updateNeighParams();
   generateBlockades(currentGridInfo, numOfBlockades);
+  // console.log(blockades);
+  // resetGridInfo();
+  // console.log(gridStats);
+  // console.log(neighborParams);
 });
 
 gridOptionbtn.addEventListener("click", () => {
@@ -241,6 +239,8 @@ window.addEventListener("resize", () => {
 
 document.addEventListener("click", function (e) {
   //general click listener
+  // console.log(e.target.parentNode.className);
+
   if (
     e.target.parentNode.className !== "master_container" &&
     pageLogics.add_block_mode_on &&
@@ -288,6 +288,7 @@ document.addEventListener("dragover", (e) => {
     ) &&
     pageLogics.add_block_mode_on
   ) {
+    // console.log(id);
     add_blockade(currentGridInfo, tempArr);
   }
 
@@ -300,6 +301,7 @@ document.addEventListener("dragover", (e) => {
     ) &&
     pageLogics.remove_block_mode_on
   ) {
+    // console.log(id);
     remove_blockade(currentGridInfo, tempArr);
   }
 });
