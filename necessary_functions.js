@@ -34,16 +34,20 @@ const Log = {
 };
 
 //always put this before the variables file
-function BINARYSEARCH(arr, start, end, target) {
+function BINARYSEARCH(arr, start, end, target, param) {
   if (end >= start) {
     let mid = Math.floor(start + (end - start) / 2);
     // console.log(arr, mid, target);
 
-    if (arr[mid] === target) return true;
+    if (arr[mid] === target) {
+      if (param) return mid;
+      else return true;
+    }
 
-    if (arr[mid] > target) return BINARYSEARCH(arr, start, mid - 1, target);
+    if (arr[mid] > target)
+      return BINARYSEARCH(arr, start, mid - 1, target, param);
 
-    return BINARYSEARCH(arr, mid + 1, end, target);
+    return BINARYSEARCH(arr, mid + 1, end, target, param);
   }
   return false;
 }

@@ -50,7 +50,15 @@ function PQfyArray(PQ, array) {
 // function fixPath(collection) {
 //   let temp = collection.shift();
 //   collection.push(temp);
-// } //dated
+// } //dated\
+
+function changeAlgo(algorithm, mode) {
+  algorithmView.textContent = `Movement algorithm is ${algorithm}. Movement is ${mode}.`;
+  elementStat.currentAlgorithm = algorithm;
+  elementStat.mode = mode;
+  algo_select.value = algorithm;
+  mode_select.value = mode;
+}
 
 function updatePosition() {
   //adjusts the constant relativlely different value for the reference
@@ -102,11 +110,7 @@ function updateNeighParams() {
 
 function removeElements(parent) {
   //removes childs of a given parent through DOM
-  let nextLastChild = parent.lastElementChild;
-  while (nextLastChild) {
-    parent.removeChild(nextLastChild);
-    nextLastChild = parent.lastElementChild;
-  }
+  parent.innerHTML = "";
   // parent.childNodes.remove();
 }
 
@@ -152,39 +156,29 @@ function generateBackground(count) {
 
 function generateBlockades(reference, count) {
   //generate and update blockades
-  illuminatePath(
-    currentGridInfo,
-    "override",
-    reference.blockades,
-    "rgb(0, 255, 0)"
-  );
+  illuminatePath(reference, "override", reference.blockades, "rgb(0, 255, 0)");
   reference.blockades = [];
-  reference.blockades.removeAll();
+  reference.blockadesPQ.removeAll();
   reference.allCheckedNodes = [];
   // console.log("debug :", blockades);
 
   for (let counter = 1; counter <= count; counter++) {
     let seed = GENERATERANDOMNUMBER(
-      referenceblockades,
+      reference.blockades,
       1,
       numOfGrid + 1,
       "integer"
     );
     // console.log(seed);
     if (seed !== NaN && seed) {
-      reference.blockades.push(seed, seed);
-      referenceblockades = PQtoArray(reference.blockades.printPQueue());
+      reference.blockadesPQ.push(seed, seed);
+      reference.blockades = PQtoArray(reference.blockadesPQ.printPQueue());
     } else {
       counter--;
     }
   }
   // console.log(blockades);
-  illuminatePath(
-    currentGridInfo,
-    "override",
-    reference.blockades,
-    "rgb(0, 0, 0)"
-  );
+  illuminatePath(reference, "override", reference.blockades, "rgb(0, 0, 0)");
 }
 
 function showFloatingMsg(string, time) {
@@ -198,11 +192,11 @@ function showFloatingMsg(string, time) {
   }, time);
 }
 
-function updateViews(current) {
+function updateViews(reference, current) {
   //update traversal view information
-  sourceView.value = currentGridInfo.currentSource;
+  sourceView.value = reference.currentSource;
   currentView.value = current;
-  targetView.value = currentGridInfo.currentTarget;
+  targetView.value = reference.currentTarget;
 }
 
 function endSequence(reference) {
@@ -225,9 +219,9 @@ function getPosition(elm2) {
 function resetPlayerChars(references) {
   //resets reference
   for (let i = 0; i < references.length; i++) {
-    if (reference.placed) document.getElementById(`1`).lastChild.remove();
-    reference.placed = false;
-    elementStat.moveComplete = true;
+    if (references[i].placed) document.getElementById(`1`).lastChild.remove();
+    references[i].placed = false;
+    references[i].moveComplete = true;
   }
 }
 
@@ -263,7 +257,7 @@ function illuminatePath(reference, command, currentPath, color) {
 
 function generalAnimation(reference, position) {
   //updates reference position
-  console.log(reference.referenceObjDOM);
+  // console.log(reference.referenceObjDOM);
 
   reference.referenceObjDOM.style = `transform :translate(${position[0]}px,${position[1]}px)`;
   reference.posX = position[0];
@@ -440,38 +434,38 @@ function block_remove_mode_toggle(value) {
 
 function processShiftBlockAddAndRemove(reference, id, command) {
   //process shift click adds and removes for add block or remove block
-  console.log(id);
+  // console.log(id);
 
   let tempArr = [];
-  if (currentGridInfo.lastSelectedNode === null) {
-    currentGridInfo.lastSelectedNode = id;
+  if (reference.lastSelectedNode === null) {
+    reference.lastSelectedNode = id;
   } else {
     let pos = getPosition(id);
-    let startPos = getPosition(currentGridInfo.lastSelectedNode);
+    let startPos = getPosition(reference.lastSelectedNode);
     let distanceX = pos[0] - startPos[0];
     let distanceY = pos[1] - startPos[1];
-    let Xreq = distanceX / playerCharacterPosition.xDistanceConstant;
-    let Yreq = distanceY / playerCharacterPosition.yDistanceConstant;
-    let idFlag = currentGridInfo.lastSelectedNode;
+    let Xreq = distanceX / gridConstants.xDistanceConstant;
+    let Yreq = distanceY / gridConstants.yDistanceConstant;
+    let idFlag = reference.lastSelectedNode;
 
     for (let i = 0; i <= Math.abs(Yreq); i++) {
       for (let j = 0; j < Math.abs(Xreq); j++) {
         if (Xreq > 0) {
-          currentGridInfo.lastSelectedNode += neighborParams.singleRight;
+          reference.lastSelectedNode += neighborParams.singleRight;
         } else {
-          currentGridInfo.lastSelectedNode += neighborParams.singleLeft;
+          reference.lastSelectedNode += neighborParams.singleLeft;
         }
-        // console.log(currentGridInfo.lastSelectedNode);
+        // console.log(reference.lastSelectedNode);
         if (command === "add") {
           if (
             !BINARYSEARCH(
               reference.blockades,
               0,
               reference.blockades.length - 1,
-              currentGridInfo.lastSelectedNode
+              reference.lastSelectedNode
             )
           ) {
-            tempArr.push(currentGridInfo.lastSelectedNode);
+            tempArr.push(reference.lastSelectedNode);
           }
         } else {
           if (
@@ -479,23 +473,23 @@ function processShiftBlockAddAndRemove(reference, id, command) {
               reference.blockades,
               0,
               reference.blockades.length - 1,
-              currentGridInfo.lastSelectedNode
+              reference.lastSelectedNode
             )
           ) {
-            tempArr.push(currentGridInfo.lastSelectedNode);
+            tempArr.push(reference.lastSelectedNode);
           }
         }
       }
       if (i === Math.abs(Yreq)) break;
 
-      currentGridInfo.lastSelectedNode = idFlag;
+      reference.lastSelectedNode = idFlag;
 
       if (Yreq > 0) {
         idFlag += neighborParams.singleBottom;
-        currentGridInfo.lastSelectedNode += neighborParams.singleBottom;
+        reference.lastSelectedNode += neighborParams.singleBottom;
       } else {
         idFlag += neighborParams.singleTop;
-        currentGridInfo.lastSelectedNode += neighborParams.singleTop;
+        reference.lastSelectedNode += neighborParams.singleTop;
       }
       // console.log(currentGridInfo.lastSelectedNode, idFlag);
       if (command === "add") {
@@ -504,10 +498,10 @@ function processShiftBlockAddAndRemove(reference, id, command) {
             reference.blockades,
             0,
             reference.blockades.length - 1,
-            currentGridInfo.lastSelectedNode
+            reference.lastSelectedNode
           )
         ) {
-          tempArr.push(currentGridInfo.lastSelectedNode);
+          tempArr.push(reference.lastSelectedNode);
         }
       } else {
         if (
@@ -515,16 +509,16 @@ function processShiftBlockAddAndRemove(reference, id, command) {
             reference.blockades,
             0,
             reference.blockades.length - 1,
-            currentGridInfo.lastSelectedNode
+            reference.lastSelectedNode
           )
         ) {
-          tempArr.push(currentGridInfo.lastSelectedNode);
+          tempArr.push(reference.lastSelectedNode);
         }
       }
     }
-    // console.log(blockades);
+    // console.log(tempArr);
 
-    currentGridInfo.lastSelectedNode = null;
+    reference.lastSelectedNode = null;
     return tempArr;
   }
 }
@@ -532,23 +526,31 @@ function processShiftBlockAddAndRemove(reference, id, command) {
 function add_blockade(reference, id) {
   //given array is push into blockades
   // console.log(id);
-  illuminatePath(currentGridInfo, `override`, id, "rgb(0, 0, 0)");
+  illuminatePath(reference, `override`, id, "rgb(0, 0, 0)");
   for (let i = 0; i < id.length; i++) {
     reference.blockadesPQ.push(id[i], id[i]);
   }
-  reference.blockades = PQtoArray(currentGridInfo.blockadesPQ.printPQueue());
+  reference.blockades = PQtoArray(reference.blockadesPQ.printPQueue());
   // binaryInsert(blockades, 0, blockades.length - 1, id)
 }
 
-function remove_blockade(id) {
+function remove_blockade(reference, id) {
   //given array is removed from blockades given they exist
   //   console.log(id);
 
-  illuminatePath(currentGridInfo, `override`, id, "rgb(0, 255, 0)");
-  blockades = PQtoArray(currentGridInfo.blockades.printPQueue());
+  illuminatePath(reference, `override`, id, "rgb(0, 255, 0)");
+  reference.blockades = PQtoArray(reference.blockadesPQ.printPQueue());
   for (let i = 0; i < id.length; i++) {
-    let idx = BINARYSEARCH(blockades, 0, blockades.length - 1, id[i], "F");
-    blockades.splice(idx, 1);
+    let idx = BINARYSEARCH(
+      reference.blockades,
+      0,
+      reference.blockades.length - 1,
+      id[i],
+      "F"
+    );
+    // console.log(idx);
+
+    reference.blockades.splice(idx, 1);
   }
   PQfyArray(reference.blockadesPQ, reference.blockades);
   //   console.log(blockades);

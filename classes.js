@@ -61,7 +61,7 @@ class referenceObj {
   placementDetermination(element, elementId, position) {
     //place reference into initial position
     this.currentTarget = elementId;
-    console.log(this.referenceObjDOM);
+    // console.log(this.referenceObjDOM);
     if (!this.placed) {
       element.innerHTML = `<div class="${this.referenceName} reference"></div>`;
       this.referenceObjDOM = GETDOMQUERY(`.${this.referenceName}`);
@@ -106,7 +106,12 @@ class referenceObj {
     updatePosition();
     if (
       this.moveComplete &&
-      !BINARYSEARCH(blockades, 0, blockades.length - 1, goingto) &&
+      !BINARYSEARCH(
+        currentGridInfo.blockades,
+        0,
+        currentGridInfo.blockades.length - 1,
+        goingto
+      ) &&
       goingto.className !== "playerCharacter"
     ) {
       playerClickCounter++;
@@ -117,8 +122,7 @@ class referenceObj {
       this.resetReferenceInfo(this);
 
       if (e.target.className !== "playerCharacter") {
-        if (!playerCharacterPosition.placed)
-          goingto = document.querySelector(`.seed_1`);
+        if (!this.placed) goingto = document.querySelector(`.seed_1`);
 
         this.placementDetermination(goingto, this.currentPositionId, [
           leftPos,
@@ -136,7 +140,7 @@ class referenceObj {
 
   simulatePath(parents, node) {
     //not always shortest depending on the algorithm
-    console.log(parents);
+    // console.log(parents);
 
     if (parents[node] === -1) {
       this.currentPath.push(node + "");
@@ -189,7 +193,7 @@ class referenceObj {
     this.timeVar = 0;
     this.tempi = 0;
     illuminatePath(this, "override", this.allCheckedNodes, "rgb(0, 255, 0)");
-    illuminatePath(this, "override", blockades, "rgb(0, 0, 0)");
+    illuminatePath(this, "override", currentGridInfo.blockades, "rgb(0, 0, 0)");
     this.allCheckedNodes = [];
     this.tsSortendTime = [];
     this.tsSortstartTime = [];

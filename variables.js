@@ -7,8 +7,10 @@ let gridColumns = GETDOMQUERY("#columns"); //column input and view
 let gridBlocks = GETDOMQUERY("#blocks"); //block input and view
 let gridGenerationBtn = GETDOMQUERY(".grid_gen"); //generation button
 let gridresetBtn = GETDOMQUERY(`.grid_reset`); //reset button
+
 let algo_select = GETDOMQUERY(`#algo`); //algo select component
 let mode_select = GETDOMQUERY(`#mode`); //direction mode select component
+
 let animation_select = GETDOMQUERY(`#animation_type`); //animation type select
 let sourceView = GETDOMQUERY(`#source`); //current source
 let currentView = GETDOMQUERY(`#current`); //current node

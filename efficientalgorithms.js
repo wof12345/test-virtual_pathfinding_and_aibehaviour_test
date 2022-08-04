@@ -58,7 +58,7 @@ function quickSort(arr, low, high) {
 //       (arr[mid + 1] > target || arr[mid + 1] === undefined) &&
 //       arr[mid] > target
 //     ) {
-//       fixateArrays(blockades, mid, blockades[mid], blockades[mid + 1]);
+//       fixateArrays(currentGridInfo. blockades, mid, currentGridInfo. blockades[mid], currentGridInfo. blockades[mid + 1]);
 //       arr[mid] = target;
 //       console.log(arr[mid]);
 
@@ -92,7 +92,7 @@ function BFS(reference, target) {
   driverFunction(reference, currentNode);
 
   // console.log(reference.normalNodeIteration);
-  updateViews(currentNode);
+  updateViews(reference, currentNode);
 
   illuminatePath(reference, "", [currentNode], "rgb(255, 255, 255)");
   // console.log(`Adjacents of ${currentNode} : `, reference.gridToNodeRelations[currentNode]);
@@ -101,7 +101,12 @@ function BFS(reference, target) {
 
     if (
       reference.gridToNodeLevel[currentAdjacent] === -1 &&
-      !BINARYSEARCH(blockades, 0, blockades.length - 1, currentAdjacent)
+      !BINARYSEARCH(
+        currentGridInfo.blockades,
+        0,
+        currentGridInfo.blockades.length - 1,
+        currentAdjacent
+      )
     ) {
       reference.gridToNodeLevel[currentAdjacent] =
         reference.gridToNodeLevel[currentNode] + 1;
@@ -147,11 +152,16 @@ function DFS(reference, currentSource, parent, target) {
       let currentAdjacent = reference.gridToNodeRelations[currentSource][i];
       if (
         reference.gridToNodeLevel[currentAdjacent] === -1 &&
-        !BINARYSEARCH(blockades, 0, blockades.length - 1, currentAdjacent)
+        !BINARYSEARCH(
+          currentGridInfo.blockades,
+          0,
+          currentGridInfo.blockades.length - 1,
+          currentAdjacent
+        )
       ) {
         reference.gridToNodeLevel[currentAdjacent] = 1;
         reference.parentNode[currentAdjacent] = currentSource;
-        updateViews(currentAdjacent);
+        updateViews(reference, currentAdjacent);
 
         DFS(reference, currentAdjacent, currentSource, target);
       } else if (
@@ -169,7 +179,7 @@ function DFS(reference, currentSource, parent, target) {
 }
 
 function Dijkstra(reference, target) {
-  console.log(reference);
+  // console.log(reference);
 
   if (reference.pqForPathfinding.isEmpty()) {
     reference.algorithmEndingAction(target, "nopath");
@@ -189,9 +199,14 @@ function Dijkstra(reference, target) {
     if (
       reference.gridToNodeDistanceFromSource[currentNode] + weightToNode <
         reference.gridToNodeDistanceFromSource[neighborNode] &&
-      !BINARYSEARCH(blockades, 0, blockades.length - 1, neighborNode)
+      !BINARYSEARCH(
+        currentGridInfo.blockades,
+        0,
+        currentGridInfo.blockades.length - 1,
+        neighborNode
+      )
     ) {
-      updateViews(neighborNode);
+      updateViews(reference, neighborNode);
       reference.gridToNodeDistanceFromSource[neighborNode] =
         reference.gridToNodeDistanceFromSource[currentNode] + weightToNode;
       reference.pqForPathfinding.push(
@@ -244,7 +259,7 @@ function Astar(reference, target) {
     // console.log("Dom traversal Complexity", timer("stop"));
 
     // timer("start");
-    // let bool = !BINARYSEARCH(blockades, 0, blockades.length - 1, neighborNode);
+    // let bool = !BINARYSEARCH(currentGridInfo. blockades, 0, currentGridInfo. blockades.length - 1, neighborNode);
     // console.log(timer("stop"));
 
     // console.log(elementColor);
@@ -263,7 +278,7 @@ function Astar(reference, target) {
         neighborNode
       )
     ) {
-      updateViews(neighborNode);
+      updateViews(reference, neighborNode);
       reference.gridToNodeDistanceFromSource[neighborNode] = fCost;
       reference.pqForPathfinding.push(neighborNode, hCost);
       reference.parentNode[neighborNode] = currentNode;

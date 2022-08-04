@@ -4,6 +4,8 @@ updateGridInfo();
 setGrid();
 generateBlockades(currentGridInfo, numOfBlockades);
 
+changeAlgo("Dijkstra", "4-Directional");
+
 function driverFunction(reference, currentNode) {
   // basically the heart of the project. Given current node generates an array of traversable neighbor nodes and ultimately relations(edges).
   if (
@@ -52,7 +54,7 @@ function driverFunction(reference, currentNode) {
     illuminatePath(reference, "", currentNeighbors, "rgba(255, 0, 0, 0.99)");
     numberOfNodesTraversed++;
   }
-  console.log(numberOfNodesTraversed);
+  // console.log(numberOfNodesTraversed);
 }
 
 function determineAlgorithm(reference, elementId) {
@@ -104,30 +106,43 @@ background.addEventListener("click", function (e) {
       }
     } else {
       if (
-        !BINARYSEARCH(blockades, 0, blockades.length - 1, goingto) &&
+        !BINARYSEARCH(
+          currentGridInfo.blockades,
+          0,
+          currentGridInfo.blockades.length - 1,
+          goingto
+        ) &&
         pageLogics.add_block_mode_on
       ) {
         // console.log(blockades);
         let tempArr = [goingto];
         if (pageKeyPressRecords.currentKeyPressed === "Shift") {
-          let isValid = processShiftBlockAddAndRemove(goingto, "add");
+          let isValid = processShiftBlockAddAndRemove(
+            currentGridInfo,
+            goingto,
+            "add"
+          );
           if (isValid) tempArr = isValid;
         } else {
           currentGridInfo.lastSelectedNode = null;
         }
-        add_blockade(tempArr);
+        add_blockade(currentGridInfo, tempArr);
         // console.log(blockades);
       }
       if (pageLogics.remove_block_mode_on) {
         // console.log(blockades);
         let tempArr = [goingto];
         if (pageKeyPressRecords.currentKeyPressed === "Shift") {
-          let isValid = processShiftBlockAddAndRemove(goingto, "remove");
+          let isValid = processShiftBlockAddAndRemove(
+            currentGridInfo,
+            goingto,
+            "remove"
+          );
           if (isValid) tempArr = isValid;
         } else {
           currentGridInfo.lastSelectedNode = null;
         }
-        remove_blockade(tempArr);
+        remove_blockade(currentGridInfo, tempArr);
         // console.log(blockades);
       }
     }
@@ -149,9 +164,8 @@ mode_select.addEventListener("change", function (e) {
   //mode select event
   let algorithm = algo_select.value;
   let mode = mode_select.value;
-  algorithmView.textContent = `Movement algorithm is ${algorithm}. Movement is ${mode}.`;
-  elementStat.currentAlgorithm = algorithm;
-  elementStat.mode = mode;
+
+  changeAlgo(algorithm, mode);
 
   showFloatingMsg(`Movement changed to ${elementStat.mode}.`, 1000);
 });
@@ -171,9 +185,9 @@ gridGenerationBtn.addEventListener("click", () => {
   generateBackground(numOfGrid);
   setGrid();
   updateNeighParams();
-  generateBlockades(numOfBlockades);
+  generateBlockades(currentGridInfo, numOfBlockades);
   // console.log(blockades);
-  resetGridInfo();
+  // resetGridInfo();
   // console.log(gridStats);
   // console.log(neighborParams);
 });
@@ -266,18 +280,28 @@ document.addEventListener("dragover", (e) => {
   let id = +element.getAttribute("id");
   let tempArr = [id];
   if (
-    !BINARYSEARCH(blockades, 0, blockades.length - 1, id) &&
+    !BINARYSEARCH(
+      currentGridInfo.blockades,
+      0,
+      currentGridInfo.blockades.length - 1,
+      id
+    ) &&
     pageLogics.add_block_mode_on
   ) {
     // console.log(id);
-    add_blockade(tempArr);
+    add_blockade(currentGridInfo, tempArr);
   }
 
   if (
-    BINARYSEARCH(blockades, 0, blockades.length - 1, id) &&
+    BINARYSEARCH(
+      currentGridInfo.blockades,
+      0,
+      currentGridInfo.blockades.length - 1,
+      id
+    ) &&
     pageLogics.remove_block_mode_on
   ) {
     // console.log(id);
-    remove_blockade(tempArr);
+    remove_blockade(currentGridInfo, tempArr);
   }
 });
