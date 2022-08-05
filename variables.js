@@ -48,7 +48,7 @@ let gridConstants = {
   yDistanceConstant: 20,
 }; //reference statistics
 
-let elementStat = {
+let traversalTypeInfo = {
   currentAlgorithm: "DFS",
   animationType: "Normal",
   mode: "8-Directional",
@@ -63,25 +63,25 @@ let neighborParams = {
     gridStats.columns,
   ],
   middle: [
-    -(gridStats.columns + 1),
     -gridStats.columns,
     -(gridStats.columns - 1),
+    -(gridStats.columns + 1),
     -1,
     1,
     gridStats.columns - 1,
-    gridStats.columns,
     gridStats.columns + 1,
+    gridStats.columns,
   ],
   right: [
-    -(gridStats.columns + 1),
     -gridStats.columns,
+    -(gridStats.columns + 1),
     -1,
-    gridStats.columns,
     gridStats.columns - 1,
+    gridStats.columns,
   ],
   left4Dir: [-gridStats.columns, 1, gridStats.columns],
   middle4Dir: [-gridStats.columns, -1, 1, gridStats.columns],
-  right4Dir: [-1, gridStats.columns],
+  right4Dir: [-gridStats.columns, -1, gridStats.columns],
   singleLeft: -1,
   singleRight: 1,
   singleTop: -gridStats.columns,
@@ -93,6 +93,7 @@ let neighborParams = {
 }; //hardcoded auto adjusting neighbour navigation parameters
 
 let currentGridInfo = {
+  nodes: [],
   blockades: [],
   blockadesPQ: new PriorityQueue(),
   allCheckedNodes: [],

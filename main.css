@@ -101,12 +101,16 @@ h1 {
   padding: 7px;
 }
 
-.ref1 {
+.black {
   background-color: black;
 }
 
-.ref2 {
+.blue {
   background-color: rgb(32, 22, 233);
+}
+
+.white {
+  background-color: rgb(255, 255, 255);
 }
 
 @media screen and (max-width: 1084px) {

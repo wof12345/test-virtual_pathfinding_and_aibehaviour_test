@@ -19,8 +19,8 @@ function PQfyArray(PQ, array) {
 
 function changeAlgo(algorithm, mode) {
   algorithmView.textContent = `Movement algorithm is ${algorithm}. Movement is ${mode}.`;
-  elementStat.currentAlgorithm = algorithm;
-  elementStat.mode = mode;
+  traversalTypeInfo.currentAlgorithm = algorithm;
+  traversalTypeInfo.mode = mode;
   algo_select.value = algorithm;
   mode_select.value = mode;
 }
@@ -107,6 +107,7 @@ function generateBackground(count) {
   //main function to generate grid
   let tempArr = "";
   for (let counter = 1; counter <= count; counter++) {
+    currentGridInfo.nodes.push(counter);
     tempArr += `<div class="landmark seed_${counter}" id="${counter}"></div>`;
     tempArr += "\n";
   }
@@ -183,7 +184,7 @@ function resetPlayerChars(references) {
   }
 }
 
-function illuminatePath(reference, command, currentPath, color) {
+function illuminatePath(reference, command, currentPath, color, opacity) {
   // using DOM, given command, color and path array illuminates them
   for (let iteration = 0; iteration < currentPath.length; iteration++) {
     if (
@@ -195,7 +196,7 @@ function illuminatePath(reference, command, currentPath, color) {
       let elementColor = element.style.backgroundColor + "";
 
       if (command === "override") {
-        element.style = `background-color:${color};`;
+        element.style = `background-color:${color};opacity:${opacity}`;
       }
 
       if (
@@ -203,7 +204,7 @@ function illuminatePath(reference, command, currentPath, color) {
         elementColor !== color &&
         elementColor != "rgb(0, 0, 0)"
       ) {
-        element.style = `background-color:${color};`;
+        element.style = `background-color:${color};opacity:${opacity}`;
 
         if (color !== "rgb(0, 0, 0)") {
           reference.allCheckedNodes.push(currentPath[iteration]);

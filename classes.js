@@ -1,9 +1,10 @@
 class referenceObj {
-  constructor(posx, posy, referenceName, isPlayer) {
+  constructor(referenceName, isPlayer, colorCode) {
     this.isPlayer = isPlayer;
+    this.colorCode = colorCode;
 
-    this.posX = posx;
-    this.posY = posy;
+    this.posX = 0;
+    this.posY = 0;
 
     this.tempi = 0;
     this.currentPath = [];
@@ -67,7 +68,7 @@ class referenceObj {
     if (!this.placed) {
       element.insertAdjacentHTML(
         "beforeend",
-        `<div class="${this.referenceName} reference"></div>`
+        `<div class="${this.referenceName} reference ${this.colorCode}"></div>`
       );
 
       this.referenceObjDOM = GETDOMQUERY(`.${this.referenceName}`);
@@ -91,50 +92,60 @@ class referenceObj {
   algorithmEndingAction(target, command) {
     //called after reference reach destination
     if (command !== "nopath") {
-      illuminatePath(this, "override", [this.currentSource], "yellow");
-      illuminatePath(this, "override", [target], "yellow");
+      illuminatePath(
+        this,
+        "override",
+        [this.currentSource],
+        this.colorCode,
+        0.7
+      );
 
       this.simulatePath(this.parentNode, target);
 
       this.placeReference(target);
+
       // console.log(this.currentPath);
 
-      illuminatePath(this, "override", this.currentPath, "yellow");
+      illuminatePath(this, "override", this.currentPath, this.colorCode, 0.5);
+      illuminatePath(this, "override", [target], this.colorCode, 0.7);
     } else {
       showFloatingMsg(`No path valid!`, 3000);
       updateViews("No path!");
       this.resetPlayerChar();
+      this.resetReferenceInfo();
     }
   }
 
   selectPlacementMode(className, goingto) {
-    let pos = getPosition(goingto);
-    let topPos = pos[1];
-    let leftPos = pos[0];
-    updatePosition();
-    if (
-      this.moveComplete &&
-      !BINARYSEARCH(
-        currentGridInfo.blockades,
-        0,
-        currentGridInfo.blockades.length - 1,
-        goingto
-      )
-    ) {
-      // playerClickCounter++;
+    if (goingto) {
+      let pos = getPosition(goingto);
+      let topPos = pos[1];
+      let leftPos = pos[0];
+      updatePosition();
+      if (
+        this.moveComplete &&
+        !BINARYSEARCH(
+          currentGridInfo.blockades,
+          0,
+          currentGridInfo.blockades.length - 1,
+          goingto
+        )
+      ) {
+        // playerClickCounter++;
 
-      this.moveComplete = false;
-      this.currentPositionId = goingto; //note
+        this.moveComplete = false;
+        this.currentPositionId = goingto; //note
 
-      this.resetReferenceInfo(this);
+        this.resetReferenceInfo(this);
 
-      if (className !== "playerCharacter") {
-        if (!this.placed) goingto = document.querySelector(`.seed_1`);
+        if (className !== "playerCharacter") {
+          if (!this.placed) goingto = document.querySelector(`.seed_1`);
 
-        this.placementDetermination(goingto, this.currentPositionId, [
-          leftPos,
-          topPos,
-        ]);
+          this.placementDetermination(goingto, this.currentPositionId, [
+            leftPos,
+            topPos,
+          ]);
+        }
       }
     }
   }
@@ -154,7 +165,7 @@ class referenceObj {
 
   placeReference(target) {
     //positions reference
-    if (elementStat.animationType === "Normal") {
+    if (traversalTypeInfo.animationType === "Normal") {
       if (this.currentPath.length <= 0) {
         this.lastPositionId = target;
         this.moveComplete = true;
@@ -201,7 +212,7 @@ class referenceObj {
 
   resetPlayerChar() {
     //resets reference
-    if (this.placed) document.getElementById(`1`).lastChild.remove();
+    if (this.placed) GETDOMQUERY(`.${this.referenceName}`).remove();
     this.placed = false;
     this.moveComplete = true;
   }

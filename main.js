@@ -20,19 +20,20 @@ function driverFunction(reference, currentNode) {
     currentNode = +currentNode;
     let arrayToFollow = neighborParams.middle;
 
-    if (elementStat.mode === "4-Directional")
+    if (traversalTypeInfo.mode === "4-Directional")
       arrayToFollow = neighborParams.middle4Dir;
 
     if (currentNode % gridStats.columns === 0) {
       arrayToFollow = neighborParams.right;
-      if (elementStat.mode === "4-Directional")
+      if (traversalTypeInfo.mode === "4-Directional")
         arrayToFollow = neighborParams.right4Dir;
     }
     if ((currentNode - 1) % gridStats.columns === 0) {
       arrayToFollow = neighborParams.left;
-      if (elementStat.mode === "4-Directional")
+      if (traversalTypeInfo.mode === "4-Directional")
         arrayToFollow = neighborParams.left4Dir;
     }
+    // if (reference.isPlayer) console.log(arrayToFollow);
 
     for (let i = 0; i < arrayToFollow.length; i++) {
       let neighborTemporaryNode = currentNode + +arrayToFollow[i];
@@ -62,54 +63,65 @@ function determineAlgorithm(reference, elementId) {
   // console.log(reference.referenceName);
 
   reference.initiateReferenceInfo(reference.lastPositionId);
-  if (elementStat.currentAlgorithm === "Dijkstra")
+  if (traversalTypeInfo.currentAlgorithm === "Dijkstra")
     Dijkstra(reference, elementId);
-  else if (elementStat.currentAlgorithm === "A*") Astar(reference, elementId);
-  else if (elementStat.currentAlgorithm === "DFS") {
+  else if (traversalTypeInfo.currentAlgorithm === "A*")
+    Astar(reference, elementId);
+  else if (traversalTypeInfo.currentAlgorithm === "DFS") {
     DFS(reference, reference.currentSource, 0, elementId);
-  } else if (elementStat.currentAlgorithm === "BFS") {
+  } else if (traversalTypeInfo.currentAlgorithm === "BFS") {
     BFS(reference, elementId);
   }
 }
 
-let ref1 = new referenceObj(0, 0, "ref1", true);
-let ref2 = new referenceObj(0, 0, "ref2", false);
-let ref3 = new referenceObj(0, 0, "ref3", false);
+initiateBehaviour();
+var ref1 = new referenceObj("ref1", true, "black");
+var ref2 = new referenceObj("ref2", false, "blue");
+var ref3 = new referenceObj("ref3", false, "white");
 
-// ref2.initiateReferenceInfo();
-// ref2.selectPlacementMode("", 2);
-// ref2.placeInSeed(100);
+function initiateBehaviour() {
+  // ref2.initiateReferenceInfo();
+  // ref2.selectPlacementMode("", 2);
+  // ref2.placeInSeed(100);
 
-setInterval(() => {
-  let rand = GENERATERANDOMNUMBER([], 1, 2000, "integer", 0);
-  let rand1 = GENERATERANDOMNUMBER([], 1, 2000, "integer", 0);
+  setInterval(() => {
+    console.log(currentGridInfo.blockades);
+    timer("start");
 
-  if (
-    !BINARYSEARCH(
+    let rand = GENERATERANDOMNUMBER([], 1, 2000, "integer", 0);
+    let rand1 = GENERATERANDOMNUMBER(
       currentGridInfo.blockades,
-      0,
-      currentGridInfo.blockades.length - 1,
-      rand
-    ) &&
-    !BINARYSEARCH(
-      currentGridInfo.blockades,
-      0,
-      currentGridInfo.blockades.length - 1,
-      rand1
+      1,
+      2000,
+      "integer",
+      0
+    );
+
+    if (!BINARYSEARCH([], 0, currentGridInfo.blockades.length - 1, rand))
+      ref2.selectPlacementMode("", rand);
+
+    if (
+      !BINARYSEARCH(
+        currentGridInfo.blockades,
+        0,
+        currentGridInfo.blockades.length - 1,
+        rand1
+      )
     )
-  )
-    ref2.selectPlacementMode("", rand);
-  ref3.selectPlacementMode("", rand1);
+      ref3.selectPlacementMode("", rand1);
 
-  console.log(rand, rand1);
-}, 5000);
+    console.log("Time taken to generate AI path : ", timer("stop"));
+
+    // console.log(rand, rand1);
+  }, 5000);
+}
 
 background.addEventListener("click", function (e) {
   //main click event listener which initiates everything
 
   if (e.target) {
     let goingto = +e.target.id;
-    console.log(ref2.posX, ref2.posY);
+    // console.log(ref2.posX, ref2.posY);
 
     if (!pageLogics.add_block_mode_on && !pageLogics.remove_block_mode_on) {
       ref1.selectPlacementMode(e.target.className, goingto);
@@ -160,10 +172,13 @@ algo_select.addEventListener("change", function (e) {
   let algorithm = algo_select.value;
   let mode = mode_select.value;
   algorithmView.textContent = `Movement algorithm is ${algorithm}. Movement is ${mode}.`;
-  elementStat.currentAlgorithm = algorithm;
-  elementStat.mode = mode;
+  traversalTypeInfo.currentAlgorithm = algorithm;
+  traversalTypeInfo.mode = mode;
 
-  showFloatingMsg(`Algorithm changed to ${elementStat.currentAlgorithm}`, 1000);
+  showFloatingMsg(
+    `Algorithm changed to ${traversalTypeInfo.currentAlgorithm}`,
+    1000
+  );
 });
 
 mode_select.addEventListener("change", function (e) {
@@ -173,19 +188,19 @@ mode_select.addEventListener("change", function (e) {
 
   changeAlgo(algorithm, mode);
 
-  showFloatingMsg(`Movement changed to ${elementStat.mode}.`, 1000);
+  showFloatingMsg(`Movement changed to ${traversalTypeInfo.mode}.`, 1000);
 });
 
 animation_select.addEventListener("change", () => {
   //animation select event
   let animation_value = animation_select.value;
 
-  elementStat.animationType = animation_value;
+  traversalTypeInfo.animationType = animation_value;
 });
 
 gridGenerationBtn.addEventListener("click", () => {
   // console.log('clicked');
-  resetPlayerChars([ref1]);
+  resetPlayerChars([ref1, ref2, ref3]);
   removeElements(background);
   updateGridInfo();
   generateBackground(numOfGrid);
@@ -208,8 +223,10 @@ traversalOptionbtn.addEventListener("click", () => {
 
 gridresetBtn.addEventListener("click", () => {
   //reset grid called after grid change or algorithm ends
-  resetPlayerChars([ref1]);
+  resetPlayerChars([ref1, ref2, ref3]);
   ref1.resetReferenceInfo();
+  ref2.resetReferenceInfo();
+  ref3.resetReferenceInfo();
 });
 
 add_block.addEventListener("click", () => {

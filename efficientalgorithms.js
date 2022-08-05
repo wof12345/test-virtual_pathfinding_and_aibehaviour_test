@@ -41,13 +41,13 @@ function simulateDFS(reference, target) {
 }
 
 function BFS(reference, target) {
-  console.log(reference);
+  // console.log(reference);
 
   let currentNode = reference.normalNodeIteration.shift();
   driverFunction(reference, currentNode);
 
   // console.log(reference.normalNodeIteration);
-  updateViews(reference, currentNode);
+  if (reference.isPlayer) updateViews(reference, currentNode);
 
   if (reference.isPlayer)
     illuminatePath(reference, "", [currentNode], "rgb(255, 255, 255)");
@@ -113,7 +113,7 @@ function DFS(reference, currentSource, parent, target) {
       ) {
         reference.gridToNodeLevel[currentAdjacent] = 1;
         reference.parentNode[currentAdjacent] = currentSource;
-        updateViews(reference, currentAdjacent);
+        if (reference.isPlayer) updateViews(reference, currentAdjacent);
 
         DFS(reference, currentAdjacent, currentSource, target);
       } else if (
@@ -161,7 +161,8 @@ function Dijkstra(reference, target) {
         neighborNode
       )
     ) {
-      updateViews(reference, neighborNode);
+      if (reference.isPlayer) updateViews(reference, neighborNode);
+
       reference.gridToNodeDistanceFromSource[neighborNode] =
         reference.gridToNodeDistanceFromSource[currentNode] + weightToNode;
       reference.pqForPathfinding.push(
@@ -228,7 +229,7 @@ function Astar(reference, target) {
         neighborNode
       )
     ) {
-      updateViews(reference, neighborNode);
+      if (reference.isPlayer) updateViews(reference, neighborNode);
       reference.gridToNodeDistanceFromSource[neighborNode] = fCost;
       reference.pqForPathfinding.push(neighborNode, hCost);
       reference.parentNode[neighborNode] = currentNode;
