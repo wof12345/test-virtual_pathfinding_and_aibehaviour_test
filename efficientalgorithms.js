@@ -40,21 +40,71 @@ function simulateDFS(reference, target) {
   }, 1);
 }
 
+function BFSrangeGen(reference, node, looped = 0, range) {
+  // console.log(range);
+  if (range === 2) {
+    range = 8;
+  } else if (range === 3) {
+    range = 25;
+  }
+
+  // console.log(reference.normalNodeIterationRange);
+  if (!looped) reference.normalNodeIterationRange.push(node);
+
+  let currentNode = reference.normalNodeIterationRange.shift();
+  // console.log("main : ", currentNode);
+
+  reference.rangeSet.push(currentNode, currentNode);
+  let currentRangeArray = [];
+
+  currentRangeArray = driverFunction(reference, currentNode, 1);
+  // console.log("arrrange", currentRangeArray);
+
+  for (let i = 0; i < currentRangeArray.length; i++) {
+    let currentAdjacent = currentRangeArray[i];
+    // console.log("neigNode", reference.gridToNodeLevelRange);
+
+    if (reference.gridToNodeLevelRange[currentAdjacent] === -1) {
+      reference.gridToNodeLevelRange[currentAdjacent] =
+        reference.gridToNodeLevelRange[currentNode] + 1;
+      reference.normalNodeIterationRange.push(currentAdjacent);
+    }
+    // console.log("Normal it :", reference.normalNodeIterationRange);
+  }
+
+  if (looped === range) {
+    let range = PQtoArray(reference.rangeSet.printPQueue());
+    reference.range = range;
+    // console.log("loopLog:", range);
+
+    fillerController(reference, "fill", "red", "1");
+    return reference.rangeSet;
+  }
+  looped++;
+
+  setTimeout(() => {
+    BFSrangeGen(reference, node, looped, range);
+  }, 0.3);
+}
+
 function BFS(reference, target) {
-  // console.log(reference);
+  //traversal method. Given a source node and a target node checks all of the source node's neighbors
+  //to traverse the graph
 
   let currentNode = reference.normalNodeIteration.shift();
+
   driverFunction(reference, currentNode);
 
-  // console.log(reference.normalNodeIteration);
-  if (reference.isPlayer) updateViews(reference, currentNode);
-
-  if (reference.isPlayer)
+  if (reference.isPlayer) {
     illuminatePath(reference, "", [currentNode], "rgb(255, 255, 255)");
+    updateViews(reference, currentNode);
+  }
 
   // console.log(`Adjacents of ${currentNode} : `, reference.gridToNodeRelations[currentNode]);
+
   for (let i = 0; i < reference.gridToNodeRelations[currentNode].length; i++) {
     let currentAdjacent = reference.gridToNodeRelations[currentNode][i];
+    // console.log(currentAdjacent);
 
     if (
       reference.gridToNodeLevel[currentAdjacent] === -1 &&
@@ -70,23 +120,28 @@ function BFS(reference, target) {
       reference.normalNodeIteration.push(currentAdjacent);
       reference.parentNode[currentAdjacent] = currentNode;
       reference.gridToNodeDistanceFromSource.push(currentAdjacent);
-    } else {
     }
   }
+
   if (currentNode === +target) {
     reference.algorithmEndingAction(target, "");
     return;
   }
+
   if (reference.normalNodeIteration.length <= 0) {
     reference.algorithmEndingAction(target, "nopath");
     return;
   }
+
   setTimeout(() => {
     BFS(reference, target);
-  }, 0.1);
+  }, 0.2);
 }
 
 function DFS(reference, currentSource, parent, target) {
+  //traversal method. Given a source node and a target node checks one of the source node's neighbors and does the same until the last connected node then repeats the same for
+  //rest of the source's neighbors
+  //to traverse the graph
   driverFunction(reference, currentSource);
   reference.closedNode.push(currentSource);
   if (currentSource === +target) {
@@ -129,6 +184,7 @@ function DFS(reference, currentSource, parent, target) {
 }
 
 function Dijkstra(reference, target) {
+  //uses BFS to compare Edge weights and distance to find the shortest path to target
   // console.log(reference);
 
   if (reference.pqForPathfinding.isEmpty()) {
@@ -183,13 +239,13 @@ function Dijkstra(reference, target) {
 }
 
 function Astar(reference, target) {
-  let currentNode;
+  //uses a heuristic to find the most optimal (not shortest) path to target. Way faster than Dijkstra
 
   if (reference.pqForPathfinding.isEmpty()) {
     reference.algorithmEndingAction(target, "nopath");
     return;
   }
-  currentNode = +reference.pqForPathfinding.front().element;
+  let currentNode = +reference.pqForPathfinding.front().element;
 
   // timer("start");
   driverFunction(reference, currentNode);
@@ -217,7 +273,7 @@ function Astar(reference, target) {
 
     let gCost = calculateDistance(reference.currentSource, neighborNode);
     let hCost = calculateDistance(neighborNode, target);
-    let fCost = gCost + hCost;
+    let fCost = gCost + hCost; //sum of traversal cost for current node from source and current node to target
 
     if (
       fCost < reference.gridToNodeDistanceFromSource[neighborNode] &&

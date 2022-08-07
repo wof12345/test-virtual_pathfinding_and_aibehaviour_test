@@ -94,13 +94,13 @@ function updateGridInfo() {
 function setGrid() {
   //adjust grid
   gridStats.rows = Math.ceil(numOfGrid / gridStats.columns);
-  background.style = ` grid-template-columns: repeat(${gridStats.columns}, 20px); grid-template-rows: repeat(${gridStats.rows}, 20px);`;
-  background.style.width = `${
-    gridStats.columns * gridConstants.xDistanceConstant
-  }px`;
-  background.style.height = `${
-    gridStats.rows * gridConstants.yDistanceConstant
-  }px`;
+  background.style = `grid-template-columns: repeat(${gridStats.columns}, ${gridStats.referenceSizeWidth}); grid-template-rows: repeat(${gridStats.rows},  ${gridStats.referenceSizeHeight});`;
+  // background.style.width = `${
+  //   gridStats.columns * gridConstants.xDistanceConstant
+  // }px`;
+  // background.style.height = `${
+  //   gridStats.rows * gridConstants.yDistanceConstant
+  // }px`;
 }
 
 function generateBackground(count) {
@@ -193,6 +193,7 @@ function illuminatePath(reference, command, currentPath, color, opacity) {
       +currentPath[iteration] <= numOfGrid
     ) {
       let element = document.getElementById(currentPath[iteration]);
+      // element.innerHTML = `<div class="filler white"></div>`;
       let elementColor = element.style.backgroundColor + "";
 
       if (command === "override") {
@@ -210,6 +211,30 @@ function illuminatePath(reference, command, currentPath, color, opacity) {
           reference.allCheckedNodes.push(currentPath[iteration]);
         }
       }
+    }
+  }
+}
+
+function fillerController(reference, command, color) {
+  let currentPath = reference.range;
+  // console.log(currentPath);
+
+  for (let iteration = 0; iteration < currentPath.length; iteration++) {
+    // console.log(currentPath);
+
+    if (+currentPath[iteration] <= numOfGrid && +currentPath[iteration]) {
+      // console.log("filler : ", iteration);
+
+      let element = document.getElementById(currentPath[iteration]);
+      element.innerHTML = `<div class="filler rangeTest ${color}"></div>`;
+
+      if (command === "override") {
+        element.innerHTML = ``;
+      }
+
+      // if (color !== "rgb(0, 0, 0)") {
+      //   reference.allCheckedNodes.push(currentPath[iteration]);
+      // }
     }
   }
 }

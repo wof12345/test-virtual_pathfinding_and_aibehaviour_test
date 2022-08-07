@@ -26,14 +26,17 @@ let droppables = GETDOMQUERY(`.node_traversal_info`); //view toggolabe options
 let add_block = GETDOMQUERY(`.grid_add_block`); //add block button
 let remove_block = GETDOMQUERY(`.grid_remove_block`); //remove block button
 
-let numOfGrid = 2000; //stores node count
-let numOfBlockades = 20; //blockade count
+let numOfGrid = 1000; //stores node count
+let numOfBlockades = 100; //blockade count
+let nodeSizes = "30px";
 
 let gridStats = {
-  columns: 50,
+  columns: 40,
   rows: 0, //don't manipulate
   fixerVarTop: background.offsetTop,
   fixerVarLeft: background.offsetLeft,
+  referenceSizeWidth: nodeSizes,
+  referenceSizeHeight: nodeSizes,
 }; //current grid statistics
 
 let playerClickCounter = 0; //counts clicks

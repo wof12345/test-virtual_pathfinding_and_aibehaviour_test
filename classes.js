@@ -28,6 +28,12 @@ class referenceObj {
     this.normalNodeIteration = [];
     this.traversalDone = false;
 
+    this.rangeLevel = 1;
+    this.gridToNodeLevelRange = [];
+    this.normalNodeIterationRange = [];
+    this.range = [];
+    this.rangeSet = new PriorityQueue();
+
     this.moveComplete = true;
 
     (this.placed = false),
@@ -49,12 +55,10 @@ class referenceObj {
       // this.tsSortendTime[i + 1] = [];
       this.gridToNodeDistanceFromSource[i + 1] = Infinity;
       this.gridToNodeDistanceToTarget[i + 1] = -1;
-      this.gridToNodeLevel[i] = -1;
     }
     this.pqForPathfinding.push(elementId, 0);
     this.normalNodeIteration.push(elementId);
     this.gridToNodeDistanceFromSource[elementId] = 0;
-    this.gridToNodeLevel[elementId] = 1;
     this.parentNode[elementId] = -1;
     this.allCheckedNodes.push(elementId);
     this.currentSource = elementId;
@@ -112,7 +116,6 @@ class referenceObj {
       showFloatingMsg(`No path valid!`, 3000);
       updateViews("No path!");
       this.resetPlayerChar();
-      this.resetReferenceInfo();
     }
   }
 
@@ -136,8 +139,6 @@ class referenceObj {
         this.moveComplete = false;
         this.currentPositionId = goingto; //note
 
-        this.resetReferenceInfo(this);
-
         if (className !== "playerCharacter") {
           if (!this.placed) goingto = document.querySelector(`.seed_1`);
 
@@ -147,6 +148,25 @@ class referenceObj {
           ]);
         }
       }
+    }
+  }
+
+  checkPathAndReSelectPlaceMentMode(currentNodeToGoto, lastNodeGoneto, target) {
+    if (
+      BINARYSEARCH(
+        currentGridInfo.blockades,
+        0,
+        currentGridInfo.blockades.length - 1,
+        +currentNodeToGoto
+      )
+    ) {
+      // console.log(target);
+      this.moveComplete = true;
+      this.lastPositionId = lastNodeGoneto;
+      this.currentSource = lastNodeGoneto;
+      this.selectPlacementMode("", target);
+      this.currentPath = [];
+      return true;
     }
   }
 
@@ -163,7 +183,7 @@ class referenceObj {
     this.currentPath.push(node + "");
   }
 
-  placeReference(target) {
+  placeReference(target, lastNodeGoneto = -1) {
     //positions reference
     if (traversalTypeInfo.animationType === "Normal") {
       if (this.currentPath.length <= 0) {
@@ -172,15 +192,37 @@ class referenceObj {
         return;
       }
 
-      let position = getPosition(this.currentPath.shift());
+      let currentNodeToGoto = this.currentPath.shift();
+
+      let position = getPosition(currentNodeToGoto);
+
+      let pathBlocked = this.checkPathAndReSelectPlaceMentMode(
+        currentNodeToGoto,
+        lastNodeGoneto,
+        target
+      );
+
+      if (pathBlocked) {
+        return;
+      }
+
+      this.resetRangeStats(currentNodeToGoto);
+      BFSrangeGen(this, currentNodeToGoto, 0, this.rangeLevel);
+
+      lastNodeGoneto = currentNodeToGoto;
+
       generalAnimation(this, position);
 
       setTimeout(() => {
-        this.placeReference(target);
-      }, 200);
+        this.placeReference(target, lastNodeGoneto);
+      }, 300);
     } else {
       let position = getPosition(this.currentPath.pop());
       this.lastPositionId = target;
+
+      this.resetRangeStats(target);
+      BFSrangeGen(this, target, 0, this.rangeLevel);
+
       this.moveComplete = true;
       generalAnimation(this, position);
     }
@@ -210,6 +252,19 @@ class referenceObj {
     this.traversalDone = false;
   }
 
+  resetRangeStats(currentNodeToGoto) {
+    fillerController(this, "override", "");
+    this.range = [];
+    this.rangeSet.removeAll();
+    this.normalNodeIterationRange = [];
+
+    for (let i = 0; i < numOfGrid; i++) {
+      this.gridToNodeLevelRange[i + 1] = -1;
+    }
+    this.gridToNodeLevel[currentNodeToGoto] = 1;
+    this.normalNodeIterationRange.push(currentNodeToGoto);
+  }
+
   resetPlayerChar() {
     //resets reference
     if (this.placed) GETDOMQUERY(`.${this.referenceName}`).remove();
@@ -219,7 +274,7 @@ class referenceObj {
 
   placeInSeed(target) {
     let position = getPosition(target);
-    console.log(position);
+    // console.log(position);
 
     generalAnimation(this, position);
   }

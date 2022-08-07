@@ -6,55 +6,74 @@ generateBlockades(currentGridInfo, numOfBlockades);
 
 changeAlgo("Dijkstra", "4-Directional");
 
-function driverFunction(reference, currentNode) {
+function driverFunction(reference, currentNode, rangeGen) {
   // basically the heart of the project. Given current node generates an array of traversable neighbor nodes and ultimately relations(edges).
+
   if (
-    !BINARYSEARCH(
-      reference.closedNode,
-      0,
-      reference.closedNode.length,
-      currentNode
-    )
+    1
+    // !BINARYSEARCH(
+    //   reference.closedNode,
+    //   0,
+    //   reference.closedNode.length,
+    //   currentNode
+    // )
   ) {
     let currentNeighbors = [];
     currentNode = +currentNode;
     let arrayToFollow = neighborParams.middle;
 
-    if (traversalTypeInfo.mode === "4-Directional")
+    if (traversalTypeInfo.mode === "4-Directional" && !rangeGen)
       arrayToFollow = neighborParams.middle4Dir;
 
     if (currentNode % gridStats.columns === 0) {
       arrayToFollow = neighborParams.right;
-      if (traversalTypeInfo.mode === "4-Directional")
+      if (traversalTypeInfo.mode === "4-Directional" && !rangeGen)
         arrayToFollow = neighborParams.right4Dir;
     }
     if ((currentNode - 1) % gridStats.columns === 0) {
       arrayToFollow = neighborParams.left;
-      if (traversalTypeInfo.mode === "4-Directional")
+      if (traversalTypeInfo.mode === "4-Directional" && !rangeGen)
         arrayToFollow = neighborParams.left4Dir;
     }
     // if (reference.isPlayer) console.log(arrayToFollow);
+    // console.log(arrayToFollow);
 
     for (let i = 0; i < arrayToFollow.length; i++) {
       let neighborTemporaryNode = currentNode + +arrayToFollow[i];
-      let distance;
 
-      if (neighborTemporaryNode <= numOfGrid && neighborTemporaryNode > 0) {
-        currentNeighbors.push(neighborTemporaryNode);
+      if (!rangeGen) {
+        let distance;
+        if (neighborTemporaryNode <= numOfGrid && neighborTemporaryNode > 0) {
+          currentNeighbors.push(neighborTemporaryNode);
 
-        reference.gridToNodeRelations[currentNode].push(neighborTemporaryNode);
-        reference.gridToNodeRelations[neighborTemporaryNode].push(currentNode);
+          reference.gridToNodeRelations[currentNode]?.push(
+            neighborTemporaryNode
+          );
+          reference.gridToNodeRelations[neighborTemporaryNode].push(
+            currentNode
+          );
 
-        distance = calculateDistance(neighborTemporaryNode, currentNode);
-        reference.gridToNodeWeights[currentNode].push(distance);
-        reference.gridToNodeWeights[neighborTemporaryNode].push(distance);
+          distance = calculateDistance(neighborTemporaryNode, currentNode);
+          reference.gridToNodeWeights[currentNode].push(distance);
+          reference.gridToNodeWeights[neighborTemporaryNode].push(distance);
+        }
+      } else {
+        if (neighborTemporaryNode > 0) {
+          currentNeighbors.push(neighborTemporaryNode);
+          reference.rangeSet.push(neighborTemporaryNode, neighborTemporaryNode);
+        }
       }
     }
 
-    if (reference.isPlayer)
+    if (reference.isPlayer && !rangeGen) {
       illuminatePath(reference, "", currentNeighbors, "rgba(255, 0, 0, 0.99)");
+      numberOfNodesTraversed++;
+    }
 
-    numberOfNodesTraversed++;
+    // if (rangeGen)
+    // console.log("currentNode range", currentNode, currentNeighbors);
+
+    return currentNeighbors;
   }
 }
 
@@ -62,7 +81,9 @@ function determineAlgorithm(reference, elementId) {
   //main algorithm call
   // console.log(reference.referenceName);
 
+  reference.resetReferenceInfo();
   reference.initiateReferenceInfo(reference.lastPositionId);
+
   if (traversalTypeInfo.currentAlgorithm === "Dijkstra")
     Dijkstra(reference, elementId);
   else if (traversalTypeInfo.currentAlgorithm === "A*")
@@ -75,6 +96,7 @@ function determineAlgorithm(reference, elementId) {
 }
 
 initiateBehaviour();
+
 var ref1 = new referenceObj("ref1", true, "black");
 var ref2 = new referenceObj("ref2", false, "blue");
 var ref3 = new referenceObj("ref3", false, "white");
@@ -85,14 +107,14 @@ function initiateBehaviour() {
   // ref2.placeInSeed(100);
 
   setInterval(() => {
-    console.log(currentGridInfo.blockades);
-    timer("start");
+    // console.log(currentGridInfo.blockades);
+    // timer("start");
 
-    let rand = GENERATERANDOMNUMBER([], 1, 2000, "integer", 0);
+    let rand = GENERATERANDOMNUMBER([], 1, numOfGrid, "integer", 0);
     let rand1 = GENERATERANDOMNUMBER(
       currentGridInfo.blockades,
       1,
-      2000,
+      numOfGrid,
       "integer",
       0
     );
@@ -110,7 +132,7 @@ function initiateBehaviour() {
     )
       ref3.selectPlacementMode("", rand1);
 
-    console.log("Time taken to generate AI path : ", timer("stop"));
+    // console.log("Time taken to generate AI path : ", timer("stop"));
 
     // console.log(rand, rand1);
   }, 5000);

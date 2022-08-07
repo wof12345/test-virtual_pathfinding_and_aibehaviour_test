@@ -11,25 +11,36 @@ class QElement {
 }
 
 class PriorityQueue {
+  //modified to act as set which contains only one of each element
   constructor() {
     this.items = [];
   }
 
   push(element, priority) {
-    var qElement = new QElement(element, priority);
+    let qElement = new QElement(element, priority);
     // console.log(qElement);
 
-    var contain = false;
-    for (var i = 0; i < this.items.length; i++) {
-      if (this.items[i].priority > qElement.priority) {
-        this.items.splice(i, 0, qElement);
+    let contain = false;
+    let isPushed = false;
+    for (let i = 0; i < this.items.length; i++) {
+      if (this.items[i].element === qElement.element) {
         contain = true;
         break;
       }
     }
 
     if (!contain) {
-      this.items.push(qElement);
+      for (let i = 0; i < this.items.length; i++) {
+        if (this.items[i].priority > qElement.priority) {
+          this.items.splice(i, 0, qElement);
+          isPushed = true;
+          break;
+        }
+      }
+
+      if (!isPushed) {
+        this.items.push(qElement);
+      }
     }
   }
 
