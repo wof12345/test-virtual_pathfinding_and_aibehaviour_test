@@ -6,7 +6,7 @@ generateBlockades(currentGridInfo, numOfBlockades);
 
 changeAlgo("Dijkstra", "4-Directional");
 
-function driverFunction(reference, currentNode, rangeGen) {
+function driverFunction(reference, currentNode, rangeGen, rangeLevel) {
   // basically the heart of the project. Given current node generates an array of traversable neighbor nodes and ultimately relations(edges).
 
   if (
@@ -22,8 +22,9 @@ function driverFunction(reference, currentNode, rangeGen) {
     currentNode = +currentNode;
     let arrayToFollow = neighborParams.middle;
 
-    if (traversalTypeInfo.mode === "4-Directional" && !rangeGen)
+    if (traversalTypeInfo.mode === "4-Directional" && !rangeGen) {
       arrayToFollow = neighborParams.middle4Dir;
+    }
 
     if (currentNode % gridStats.columns === 0) {
       arrayToFollow = neighborParams.right;
@@ -58,9 +59,21 @@ function driverFunction(reference, currentNode, rangeGen) {
           reference.gridToNodeWeights[neighborTemporaryNode].push(distance);
         }
       } else {
-        if (neighborTemporaryNode > 0) {
-          currentNeighbors.push(neighborTemporaryNode);
-          reference.rangeSet.push(neighborTemporaryNode, neighborTemporaryNode);
+        if (neighborTemporaryNode >= 0) {
+          console.log(currentNode + -1 * rangeLevel);
+
+          if (
+            neighborTemporaryNode >=
+            currentNode - gridStats.columns * rangeLevel
+          ) {
+            console.log("pushed :", neighborTemporaryNode);
+
+            currentNeighbors.push(neighborTemporaryNode);
+            reference.rangeSet.push(
+              neighborTemporaryNode,
+              neighborTemporaryNode
+            );
+          }
         }
       }
     }
@@ -95,7 +108,7 @@ function determineAlgorithm(reference, elementId) {
   }
 }
 
-initiateBehaviour();
+// initiateBehaviour();
 
 var ref1 = new referenceObj("ref1", true, "black");
 var ref2 = new referenceObj("ref2", false, "blue");

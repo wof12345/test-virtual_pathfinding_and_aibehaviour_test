@@ -28,7 +28,7 @@ class referenceObj {
     this.normalNodeIteration = [];
     this.traversalDone = false;
 
-    this.rangeLevel = 1;
+    this.rangeLevel = 5;
     this.gridToNodeLevelRange = [];
     this.normalNodeIterationRange = [];
     this.range = [];
@@ -253,7 +253,7 @@ class referenceObj {
   }
 
   resetRangeStats(currentNodeToGoto) {
-    fillerController(this, "override", "");
+    fillerController(this, "override", this.colorCode);
     this.range = [];
     this.rangeSet.removeAll();
     this.normalNodeIterationRange = [];

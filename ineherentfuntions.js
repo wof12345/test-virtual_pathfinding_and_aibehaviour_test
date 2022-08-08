@@ -217,19 +217,42 @@ function illuminatePath(reference, command, currentPath, color, opacity) {
 
 function fillerController(reference, command, color) {
   let currentPath = reference.range;
-  // console.log(currentPath);
+  console.log(currentPath);
 
   for (let iteration = 0; iteration < currentPath.length; iteration++) {
     // console.log(currentPath);
 
-    if (+currentPath[iteration] <= numOfGrid && +currentPath[iteration]) {
+    if (+currentPath[iteration] <= numOfGrid && +currentPath[iteration] >= 0) {
       // console.log("filler : ", iteration);
 
       let element = document.getElementById(currentPath[iteration]);
-      element.innerHTML = `<div class="filler rangeTest ${color}"></div>`;
+      // console.log("iteration : ", element, currentPath[iteration]);
+      if (element) {
+        let elementFiller = element.querySelector(`.${color}`);
+        // console.log(color);
 
-      if (command === "override") {
-        element.innerHTML = ``;
+        if (!elementFiller || currentPath[iteration] === 1) {
+          if (currentPath[iteration] === 1) {
+            let exists = element.querySelector(`.filler`);
+            if (exists) exists.remove();
+          }
+
+          element.insertAdjacentHTML(
+            "beforeend",
+            `<div class="filler rangeTest ${color}" id="${element.id}"></div>`
+          );
+        }
+
+        if (command === "override") {
+          if (currentPath[iteration] === 1) {
+            elementFiller = element.querySelector(`.filler`);
+          } else elementFiller = element.querySelector(`.${color}`);
+
+          // console.log(elementFiller);
+
+          if (elementFiller.className.includes("filler"))
+            elementFiller.remove();
+        }
       }
 
       // if (color !== "rgb(0, 0, 0)") {

@@ -46,6 +46,10 @@ function BFSrangeGen(reference, node, looped = 0, range) {
     range = 8;
   } else if (range === 3) {
     range = 25;
+  } else if (range === 4) {
+    range = 50;
+  } else if (range === 5) {
+    range = 82;
   }
 
   // console.log(reference.normalNodeIterationRange);
@@ -57,17 +61,18 @@ function BFSrangeGen(reference, node, looped = 0, range) {
   reference.rangeSet.push(currentNode, currentNode);
   let currentRangeArray = [];
 
-  currentRangeArray = driverFunction(reference, currentNode, 1);
-  // console.log("arrrange", currentRangeArray);
+  currentRangeArray = driverFunction(reference, currentNode, 1, range);
+  // if (reference.isPlayer) console.log("arrrange", currentRangeArray);
 
   for (let i = 0; i < currentRangeArray.length; i++) {
     let currentAdjacent = currentRangeArray[i];
     // console.log("neigNode", reference.gridToNodeLevelRange);
-
-    if (reference.gridToNodeLevelRange[currentAdjacent] === -1) {
-      reference.gridToNodeLevelRange[currentAdjacent] =
-        reference.gridToNodeLevelRange[currentNode] + 1;
-      reference.normalNodeIterationRange.push(currentAdjacent);
+    if (currentAdjacent <= numOfGrid && currentAdjacent >= 0) {
+      if (reference.gridToNodeLevelRange[currentAdjacent] === -1) {
+        reference.gridToNodeLevelRange[currentAdjacent] =
+          reference.gridToNodeLevelRange[currentNode] + 1;
+        reference.normalNodeIterationRange.push(currentAdjacent);
+      }
     }
     // console.log("Normal it :", reference.normalNodeIterationRange);
   }
@@ -77,14 +82,12 @@ function BFSrangeGen(reference, node, looped = 0, range) {
     reference.range = range;
     // console.log("loopLog:", range);
 
-    fillerController(reference, "fill", "red", "1");
+    fillerController(reference, "fill", reference.colorCode, "1");
     return reference.rangeSet;
   }
   looped++;
 
-  setTimeout(() => {
-    BFSrangeGen(reference, node, looped, range);
-  }, 0.3);
+  BFSrangeGen(reference, node, looped, range);
 }
 
 function BFS(reference, target) {
