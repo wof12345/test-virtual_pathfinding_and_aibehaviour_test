@@ -58,7 +58,7 @@ function BFSrangeGen(reference, node, looped = 0, range) {
   let currentNode = reference.normalNodeIterationRange.shift();
   // console.log("main : ", currentNode);
 
-  reference.rangeSet.push(currentNode, currentNode);
+  // reference.rangeSet.push(currentNode, currentNode);
   let currentRangeArray = [];
 
   currentRangeArray = driverFunction(reference, currentNode, 1, range);
@@ -207,9 +207,6 @@ function Dijkstra(reference, target) {
     let neighborNode = +reference.gridToNodeRelations[currentNode][i];
     let weightToNode = +reference.gridToNodeWeights[currentNode][i];
 
-    if (reference.isPlayer)
-      illuminatePath(reference, "", [currentNode], "rgb(255, 255, 255)");
-
     if (
       reference.gridToNodeDistanceFromSource[currentNode] + weightToNode <
         reference.gridToNodeDistanceFromSource[neighborNode] &&
@@ -220,8 +217,6 @@ function Dijkstra(reference, target) {
         neighborNode
       )
     ) {
-      if (reference.isPlayer) updateViews(reference, neighborNode);
-
       reference.gridToNodeDistanceFromSource[neighborNode] =
         reference.gridToNodeDistanceFromSource[currentNode] + weightToNode;
       reference.pqForPathfinding.push(
@@ -229,9 +224,14 @@ function Dijkstra(reference, target) {
         reference.gridToNodeDistanceFromSource[neighborNode]
       );
       reference.parentNode[neighborNode] = currentNode;
-    } else {
     }
   }
+
+  if (reference.isPlayer) {
+    illuminatePath(reference, "", [currentNode], "rgb(255, 255, 255)");
+    updateViews(reference, currentNode);
+  }
+
   setTimeout(() => {
     reference.gridToNodeLevel[currentNode] = reference.gridToNodeLevel[
       currentNode
@@ -301,5 +301,89 @@ function Astar(reference, target) {
       currentNode
     ]++;
     Astar(reference, target);
+  }, 0.1);
+}
+
+function BellmanFord(reference, target, foundpath = false) {
+  // Relax all edges |V| - 1 times. A simple
+  // shortest path from src to any other
+  // vertex can have at-most |V| - 1 edges
+
+  if (reference.pqForPathfinding.isEmpty()) {
+    // reference.algorithmEndingAction(target, "nopath");
+    for (let i = 1; i <= reference.gridToNodeRelations.length - 1; i++) {
+      if (i === 1) console.log(reference.gridToNodeRelations);
+
+      // console.log(i);
+
+      let x = reference.gridToNodeRelations[i][0];
+      let y = reference.gridToNodeRelations[i][1];
+      let weight = reference.gridToNodeWeights[i];
+      if (
+        reference.gridToNodeDistanceFromSource[x] != Infinity &&
+        reference.gridToNodeDistanceFromSource[x] + weight <
+          reference.gridToNodeDistanceFromSource[y]
+      )
+        console.log("Graph contains negative weight cycle");
+    }
+
+    console.log("Vertex Distance from Source");
+    for (let i = 1; i <= numOfGrid; i++)
+      console.log(i, reference.gridToNodeDistanceFromSource[i]);
+    return;
+  }
+  let currentNode = +reference.pqForPathfinding.front().element;
+
+  driverFunction(reference, currentNode);
+
+  reference.pqForPathfinding.remove();
+  if (currentNode == target) {
+    reference.algorithmEndingAction(target, "");
+    // return;
+  }
+
+  for (let i = 0; i < reference.gridToNodeRelations[currentNode].length; i++) {
+    let neighborNode = +reference.gridToNodeRelations[currentNode][i];
+    let weightToNode = +reference.gridToNodeWeights[currentNode][i];
+
+    if (
+      reference.gridToNodeDistanceFromSource[currentNode] + weightToNode <
+        reference.gridToNodeDistanceFromSource[neighborNode] &&
+      !BINARYSEARCH(
+        currentGridInfo.blockades,
+        0,
+        currentGridInfo.blockades.length - 1,
+        neighborNode
+      )
+    ) {
+      illuminatePath(reference, "", [currentNode], "rgb(255, 255, 255)");
+
+      reference.gridToNodeDistanceFromSource[neighborNode] =
+        reference.gridToNodeDistanceFromSource[currentNode] + weightToNode;
+      reference.pqForPathfinding.push(
+        neighborNode,
+        reference.gridToNodeDistanceFromSource[neighborNode]
+      );
+
+      if (!foundpath) reference.parentNode[neighborNode] = currentNode;
+    }
+  }
+
+  if (reference.isPlayer) {
+    illuminatePath(reference, "", [currentNode], "rgb(255, 255, 255)");
+    updateViews(reference, currentNode);
+  }
+  // check for negative-weight cycles.
+  // The above step guarantees shortest
+  // distances if graph doesn't contain
+  // negative weight cycle.  If we get a
+  // shorter path, then there is a cycle.
+
+  setTimeout(() => {
+    reference.gridToNodeLevel[currentNode] = reference.gridToNodeLevel[
+      currentNode
+    ]++;
+    reference.closedNode.push(currentNode);
+    BellmanFord(reference, target, foundpath);
   }, 0.1);
 }

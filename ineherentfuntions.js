@@ -217,7 +217,7 @@ function illuminatePath(reference, command, currentPath, color, opacity) {
 
 function fillerController(reference, command, color) {
   let currentPath = reference.range;
-  console.log(currentPath);
+  // console.log(currentPath);
 
   for (let iteration = 0; iteration < currentPath.length; iteration++) {
     // console.log(currentPath);

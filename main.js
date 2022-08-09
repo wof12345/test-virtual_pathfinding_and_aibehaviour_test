@@ -4,7 +4,7 @@ updateGridInfo();
 setGrid();
 generateBlockades(currentGridInfo, numOfBlockades);
 
-changeAlgo("Dijkstra", "4-Directional");
+changeAlgo("Bellman ford", "4-Directional");
 
 function driverFunction(reference, currentNode, rangeGen, rangeLevel) {
   // basically the heart of the project. Given current node generates an array of traversable neighbor nodes and ultimately relations(edges).
@@ -55,18 +55,20 @@ function driverFunction(reference, currentNode, rangeGen, rangeLevel) {
           );
 
           distance = calculateDistance(neighborTemporaryNode, currentNode);
+          // console.log(currentNode, neighborTemporaryNode, distance);
+
           reference.gridToNodeWeights[currentNode].push(distance);
           reference.gridToNodeWeights[neighborTemporaryNode].push(distance);
         }
       } else {
         if (neighborTemporaryNode >= 0) {
-          console.log(currentNode + -1 * rangeLevel);
+          // console.log(currentNode + -1 * rangeLevel);
 
           if (
             neighborTemporaryNode >=
             currentNode - gridStats.columns * rangeLevel
           ) {
-            console.log("pushed :", neighborTemporaryNode);
+            // console.log("pushed :", neighborTemporaryNode);
 
             currentNeighbors.push(neighborTemporaryNode);
             reference.rangeSet.push(
@@ -99,13 +101,14 @@ function determineAlgorithm(reference, elementId) {
 
   if (traversalTypeInfo.currentAlgorithm === "Dijkstra")
     Dijkstra(reference, elementId);
+  else if (traversalTypeInfo.currentAlgorithm === "Bellman ford")
+    BellmanFord(reference, elementId);
   else if (traversalTypeInfo.currentAlgorithm === "A*")
     Astar(reference, elementId);
-  else if (traversalTypeInfo.currentAlgorithm === "DFS") {
+  else if (traversalTypeInfo.currentAlgorithm === "DFS")
     DFS(reference, reference.currentSource, 0, elementId);
-  } else if (traversalTypeInfo.currentAlgorithm === "BFS") {
+  else if (traversalTypeInfo.currentAlgorithm === "BFS")
     BFS(reference, elementId);
-  }
 }
 
 // initiateBehaviour();

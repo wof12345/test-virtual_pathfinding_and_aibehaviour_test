@@ -28,7 +28,7 @@ class referenceObj {
     this.normalNodeIteration = [];
     this.traversalDone = false;
 
-    this.rangeLevel = 5;
+    this.rangeLevel = 2;
     this.gridToNodeLevelRange = [];
     this.normalNodeIterationRange = [];
     this.range = [];
