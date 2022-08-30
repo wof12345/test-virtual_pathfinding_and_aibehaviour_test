@@ -4,7 +4,18 @@ updateGridInfo();
 setGrid();
 generateBlockades(currentGridInfo, numOfBlockades);
 
-changeAlgo("Bellman ford", "4-Directional");
+// add_blockade(currentGridInfo, [50]);
+// timer("start");
+// let found = BINARYSEARCH(
+//   currentGridInfo.blockades,
+//   0,
+//   currentGridInfo.blockades.length - 1,
+//   50
+// );
+// let time = timer("stop");
+// console.log(time, found);
+
+changeAlgo("Dijkstra", "4-Directional");
 
 function driverFunction(reference, currentNode, rangeGen, rangeLevel) {
   // basically the heart of the project. Given current node generates an array of traversable neighbor nodes and ultimately relations(edges).
@@ -37,7 +48,7 @@ function driverFunction(reference, currentNode, rangeGen, rangeLevel) {
         arrayToFollow = neighborParams.left4Dir;
     }
     // if (reference.isPlayer) console.log(arrayToFollow);
-    // console.log(arrayToFollow);
+    // console.log(currentNode, arrayToFollow);
 
     for (let i = 0; i < arrayToFollow.length; i++) {
       let neighborTemporaryNode = currentNode + +arrayToFollow[i];
@@ -103,6 +114,8 @@ function determineAlgorithm(reference, elementId) {
     Dijkstra(reference, elementId);
   else if (traversalTypeInfo.currentAlgorithm === "Bellman ford")
     BellmanFord(reference, elementId);
+  else if (traversalTypeInfo.currentAlgorithm === "Yen's K")
+    YensK(reference, elementId, 0, 3);
   else if (traversalTypeInfo.currentAlgorithm === "A*")
     Astar(reference, elementId);
   else if (traversalTypeInfo.currentAlgorithm === "DFS")
@@ -356,5 +369,15 @@ document.addEventListener("dragover", (e) => {
     pageLogics.remove_block_mode_on
   ) {
     remove_blockade(currentGridInfo, tempArr);
+  }
+});
+
+document.addEventListener("mouseover", (e) => {
+  let target = e.target;
+  let targetClass = target.className;
+  let targetId = target.id;
+
+  if (targetId) {
+    updateRelevantInfo(targetId);
   }
 });

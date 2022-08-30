@@ -28,6 +28,8 @@ class referenceObj {
     this.normalNodeIteration = [];
     this.traversalDone = false;
 
+    this.kthPath = [];
+
     this.rangeLevel = 2;
     this.gridToNodeLevelRange = [];
     this.normalNodeIterationRange = [];
@@ -50,15 +52,17 @@ class referenceObj {
     for (let i = 0; i < numOfGrid; i++) {
       this.gridToNodeRelations[i + 1] = [];
       this.gridToNodeWeights[i + 1] = [];
-      this.gridToNodeLevel[i + 1] = [];
+      this.gridToNodeLevel[i + 1] = -1;
       // this.tsSortstartTime[i + 1] = [];
       // this.tsSortendTime[i + 1] = [];
       this.gridToNodeDistanceFromSource[i + 1] = Infinity;
       this.gridToNodeDistanceToTarget[i + 1] = -1;
+      this.multiParentNode[i + 1] = [];
     }
     this.pqForPathfinding.push(elementId, 0);
     this.normalNodeIteration.push(elementId);
     this.gridToNodeDistanceFromSource[elementId] = 0;
+    this.gridToNodeLevel[elementId] = 1;
     this.parentNode[elementId] = -1;
     this.allCheckedNodes.push(elementId);
     this.currentSource = elementId;
@@ -72,7 +76,7 @@ class referenceObj {
     if (!this.placed) {
       element.insertAdjacentHTML(
         "beforeend",
-        `<div class="${this.referenceName} reference ${this.colorCode}"></div>`
+        `<div class="${this.referenceName} reference ${this.colorCode}" id="${this.referenceName}"><div class="reference_desc" id="desc_${this.referenceName}"></div></div>`
       );
 
       this.referenceObjDOM = GETDOMQUERY(`.${this.referenceName}`);
@@ -140,7 +144,7 @@ class referenceObj {
         this.currentPositionId = goingto; //note
 
         if (className !== "playerCharacter") {
-          if (!this.placed) goingto = document.querySelector(`.seed_1`);
+          if (!this.placed) goingto = document.querySelector(`.seed_0`);
 
           this.placementDetermination(goingto, this.currentPositionId, [
             leftPos,
@@ -172,6 +176,7 @@ class referenceObj {
 
   simulatePath(parents, node) {
     //not always shortest depending on the algorithm
+    // console.log(this.parentNode, node);
 
     if (parents[node] === -1) {
       this.currentPath.push(node + "");
@@ -250,6 +255,8 @@ class referenceObj {
     this.tsSortstartTime = [];
     this.normalNodeIteration = [];
     this.traversalDone = false;
+    this.kthPath = [];
+    this.multiParentNode = [];
   }
 
   resetRangeStats(currentNodeToGoto) {
@@ -261,7 +268,7 @@ class referenceObj {
     for (let i = 0; i < numOfGrid; i++) {
       this.gridToNodeLevelRange[i + 1] = -1;
     }
-    this.gridToNodeLevel[currentNodeToGoto] = 1;
+    // this.gridToNodeLevel[currentNodeToGoto] = 1;
     this.normalNodeIterationRange.push(currentNodeToGoto);
   }
 

@@ -27,8 +27,8 @@ function changeAlgo(algorithm, mode) {
 
 function updatePosition() {
   //adjusts the constant relativlely different value for the reference
-  let temp1 = background.offsetTop;
-  let temp2 = background.offsetLeft;
+  let temp1 = background.offsetTop - 40;
+  let temp2 = background.offsetLeft - 6;
 
   gridStats.fixerVarLeft = temp2;
   gridStats.fixerVarTop = temp1;
@@ -108,7 +108,7 @@ function generateBackground(count) {
   let tempArr = "";
   for (let counter = 1; counter <= count; counter++) {
     currentGridInfo.nodes.push(counter);
-    tempArr += `<div class="landmark seed_${counter}" id="${counter}"></div>`;
+    tempArr += `<div class="landmark seed_${counter}" id="${counter}"><div class="seed_desc" id="desc_${counter}"></div></div>`;
     tempArr += "\n";
   }
   background.innerHTML = tempArr;
@@ -156,6 +156,27 @@ function updateViews(reference, current) {
   sourceView.value = reference.currentSource;
   currentView.value = current;
   targetView.value = reference.currentTarget;
+}
+
+function updateRelevantInfo(id) {
+  let desc_box = GETDOMQUERY(`#desc_${id}`);
+
+  if (id.includes("ref")) {
+    let message = `Reference : ${id}`;
+    if (ref1.placed) message += ` current seed = ${ref1.lastPositionId}`;
+    desc_box.innerHTML = message;
+  } else {
+    let message = `Node : ${id}`;
+    // console.log(ref1.currentSource);
+
+    if (ref1.lastPositionId) {
+      message += ` Distance from source : ${calculateDistance(
+        ref1.lastPositionId,
+        id
+      )}`;
+    }
+    desc_box.innerHTML = message;
+  }
 }
 
 function endSequence(reference) {
@@ -231,12 +252,7 @@ function fillerController(reference, command, color) {
         let elementFiller = element.querySelector(`.${color}`);
         // console.log(color);
 
-        if (!elementFiller || currentPath[iteration] === 1) {
-          if (currentPath[iteration] === 1) {
-            let exists = element.querySelector(`.filler`);
-            if (exists) exists.remove();
-          }
-
+        if (!elementFiller) {
           element.insertAdjacentHTML(
             "beforeend",
             `<div class="filler rangeTest ${color}" id="${element.id}"></div>`
@@ -244,9 +260,7 @@ function fillerController(reference, command, color) {
         }
 
         if (command === "override") {
-          if (currentPath[iteration] === 1) {
-            elementFiller = element.querySelector(`.filler`);
-          } else elementFiller = element.querySelector(`.${color}`);
+          elementFiller = element.querySelector(`.${color}`);
 
           // console.log(elementFiller);
 

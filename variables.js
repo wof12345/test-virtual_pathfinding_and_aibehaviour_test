@@ -33,11 +33,13 @@ let nodeSizes = "30px";
 let gridStats = {
   columns: 40,
   rows: 0, //don't manipulate
-  fixerVarTop: background.offsetTop,
-  fixerVarLeft: background.offsetLeft,
+  fixerVarTop: background.offsetTop - 40,
+  fixerVarLeft: background.offsetLeft - 6,
   referenceSizeWidth: nodeSizes,
   referenceSizeHeight: nodeSizes,
 }; //current grid statistics
+
+// console.log(gridStats.fixerVarTop);
 
 let playerClickCounter = 0; //counts clicks
 
@@ -47,8 +49,8 @@ let player = "";
 
 let gridConstants = {
   yChangeConstant: gridStats.columns,
-  xDistanceConstant: 20,
-  yDistanceConstant: 20,
+  xDistanceConstant: 10,
+  yDistanceConstant: 10,
 }; //reference statistics
 
 let traversalTypeInfo = {

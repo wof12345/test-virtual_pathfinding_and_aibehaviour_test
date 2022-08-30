@@ -95,6 +95,7 @@ function BFS(reference, target) {
   //to traverse the graph
 
   let currentNode = reference.normalNodeIteration.shift();
+  // console.log(reference.parentNode);
 
   driverFunction(reference, currentNode);
 
@@ -102,11 +103,20 @@ function BFS(reference, target) {
     illuminatePath(reference, "", [currentNode], "rgb(255, 255, 255)");
     updateViews(reference, currentNode);
   }
+  // console.log(currentNode);
+
+  if (currentNode === +target) {
+    // console.log(reference.parentNode);
+    reference.algorithmEndingAction(target, "");
+
+    return;
+  }
 
   // console.log(`Adjacents of ${currentNode} : `, reference.gridToNodeRelations[currentNode]);
 
   for (let i = 0; i < reference.gridToNodeRelations[currentNode].length; i++) {
     let currentAdjacent = reference.gridToNodeRelations[currentNode][i];
+    // console.log(currentAdjacent, reference.gridToNodeLevel[currentAdjacent]);
     // console.log(currentAdjacent);
 
     if (
@@ -124,11 +134,6 @@ function BFS(reference, target) {
       reference.parentNode[currentAdjacent] = currentNode;
       reference.gridToNodeDistanceFromSource.push(currentAdjacent);
     }
-  }
-
-  if (currentNode === +target) {
-    reference.algorithmEndingAction(target, "");
-    return;
   }
 
   if (reference.normalNodeIteration.length <= 0) {
@@ -312,7 +317,7 @@ function BellmanFord(reference, target, foundpath = false) {
   if (reference.pqForPathfinding.isEmpty()) {
     // reference.algorithmEndingAction(target, "nopath");
     for (let i = 1; i <= reference.gridToNodeRelations.length - 1; i++) {
-      if (i === 1) console.log(reference.gridToNodeRelations);
+      // if (i === 1) console.log(reference.gridToNodeRelations);
 
       // console.log(i);
 
@@ -328,8 +333,8 @@ function BellmanFord(reference, target, foundpath = false) {
     }
 
     console.log("Vertex Distance from Source");
-    for (let i = 1; i <= numOfGrid; i++)
-      console.log(i, reference.gridToNodeDistanceFromSource[i]);
+    // for (let i = 1; i <= numOfGrid; i++)
+    //   console.log(i, reference.gridToNodeDistanceFromSource[i]);
     return;
   }
   let currentNode = +reference.pqForPathfinding.front().element;
@@ -385,5 +390,101 @@ function BellmanFord(reference, target, foundpath = false) {
     ]++;
     reference.closedNode.push(currentNode);
     BellmanFord(reference, target, foundpath);
+  }, 0.1);
+}
+
+function YensK(reference, target, paths, limit) {
+  //uses BFS to compare Edge weights and distance to find k shortest path to target
+  // console.log(reference);
+
+  if (reference.pqForPathfinding.isEmpty()) {
+    // reference.algorithmEndingAction(target, "nopath");
+    // console.log(reference.parentNode);
+
+    return;
+  }
+
+  let currentNode = +reference.pqForPathfinding.front().element;
+
+  if (currentNode === target) {
+    paths++;
+
+    // reference.simulatePath(reference.parentNode, target);
+    // reference.kthPath.push(reference.currentPath);
+    // reference.parentNode = reference.currentPath = [];
+    // reference.closedNode.pop();
+    // reference.pqForPathfinding.removeAll();
+    // for (let i = 0; i < numOfGrid; i++) {
+    //   reference.gridToNodeRelations[i + 1] = [];
+    //   reference.gridToNodeWeights[i + 1] = [];
+    //   reference.gridToNodeDistanceFromSource[i + 1] = Infinity;
+    // }
+    // reference.pqForPathfinding.push(reference.currentSource, 0);
+    // currentNode = +reference.pqForPathfinding.front().element;
+    // reference.gridToNodeDistanceFromSource[currentNode] = 0;
+
+    // console.log(currentNode, reference.closedNode);
+
+    // console.log(reference.kthPath, paths, limit, paths === limit);
+
+    console.log(reference.gridToNodeRelations);
+
+    return;
+  }
+
+  driverFunction(reference, currentNode);
+
+  reference.pqForPathfinding.remove();
+  // if (currentNode === target) {
+  //   // reference.algorithmEndingAction(target, "");
+  //   // reference.kthPath.push(reference.currentPath);
+  //   console.log(reference.parentNode);
+
+  //   return;
+  // }
+  for (let i = 0; i < reference.gridToNodeRelations[currentNode].length; i++) {
+    let neighborNode = +reference.gridToNodeRelations[currentNode][i];
+    let weightToNode = +reference.gridToNodeWeights[currentNode][i];
+    console.log(
+      "inner",
+      currentNode,
+      neighborNode,
+      reference.currentSource,
+      reference.gridToNodeDistanceFromSource[currentNode] + weightToNode <
+        reference.gridToNodeDistanceFromSource[neighborNode]
+    );
+
+    if (
+      reference.gridToNodeDistanceFromSource[currentNode] + weightToNode <
+        reference.gridToNodeDistanceFromSource[neighborNode] &&
+      !BINARYSEARCH(
+        currentGridInfo.blockades,
+        0,
+        currentGridInfo.blockades.length - 1,
+        neighborNode
+      ) &&
+      !reference.closedNode.find((elm) => elm === neighborNode)
+    ) {
+      reference.gridToNodeDistanceFromSource[neighborNode] =
+        reference.gridToNodeDistanceFromSource[currentNode] + weightToNode;
+      reference.pqForPathfinding.push(
+        neighborNode,
+        reference.gridToNodeDistanceFromSource[neighborNode]
+      );
+      reference.multiParentNode[neighborNode].push(currentNode);
+    }
+  }
+
+  if (reference.isPlayer) {
+    illuminatePath(reference, "", [currentNode], "rgb(255, 255, 255)");
+    updateViews(reference, currentNode);
+  }
+
+  setTimeout(() => {
+    reference.gridToNodeLevel[currentNode] = reference.gridToNodeLevel[
+      currentNode
+    ]++;
+
+    YensK(reference, target, paths, limit);
   }, 0.1);
 }
